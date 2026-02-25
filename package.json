@@ -16,5 +16,9 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "expressjs": "^1.0.1",
+    "mongodb": "^7.1.0"
   }
 }
