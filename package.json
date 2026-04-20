@@ -15,12 +15,13 @@
   "type": "module",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.ts",
+    "seeddb": "node tasks/seed.ts"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "bson": "^7.2.0",
-    "express": "^1.0.1",
+    "express": "^5.2.1",
     "express-handlebars": "^9.0.1",
     "express-session": "^1.19.0",
     "memory-pager": "^1.5.0",
@@ -33,5 +34,9 @@
     "webidl-conversions": "^7.0.0",
     "whatwg-url": "^14.2.0",
     "xss": "^1.0.15"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/express": "^5.0.6"
   }
 }
