@@ -1,9 +1,10 @@
-import { dbConnection } from "./mongoConnection.ts";
+import { Collection, Document } from "mongodb";
+import { dbConnection } from "./mongoConnection.js";
 
 const getCollectionFn = (collection: string) => {
-  let _col: any = undefined;
+  let _col: Collection<Document> | undefined = undefined;
 
-  return async (): Promise<any> => {
+  return async (): Promise<Collection<Document>> => {
     if (!_col) {
       const db = await dbConnection();
       _col = await db.collection(collection);

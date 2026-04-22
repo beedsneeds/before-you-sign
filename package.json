@@ -13,10 +13,13 @@
   "license": "MIT",
   "author": "Bharadhwaj, Nikunj, Rachel, Victor",
   "type": "module",
-  "main": "app.js",
+  "main": "dist/app.js",
   "scripts": {
-    "start": "node app.ts",
-    "seeddb": "node tasks/seed.ts"
+    "dev": "tsx watch app.ts",
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "seeddb": "tsx tasks/seed.ts",
+    "format": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -27,16 +30,23 @@
     "memory-pager": "^1.5.0",
     "mongodb": "^7.1.0",
     "mongodb-connection-string-url": "^7.0.1",
+    "mongoose": "^9.5.0",
     "punycode": "^2.3.1",
     "sparse-bitfield": "^3.0.3",
     "tr46": "^5.1.1",
     "typescript": "^6.0.3",
     "webidl-conversions": "^7.0.0",
     "whatwg-url": "^14.2.0",
-    "xss": "^1.0.15"
+    "xss": "^1.0.15",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
-    "@types/express": "^5.0.6"
+    "@types/express": "^5.0.6",
+    "@types/express-handlebars": "^5.3.1",
+    "@types/express-session": "^1.19.0",
+    "prettier": "^3.8.3",
+    "tsx": "^4.21.0"
   }
 }
+
