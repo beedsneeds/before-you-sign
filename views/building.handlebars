@@ -1,0 +1,15 @@
+<h1>{{building.Address}}</h1>
+
+<p>ID: {{building.BuildingID}}</p>
+
+<h2>Reviews</h2>
+
+{{#each reviews}}
+  <p>{{this.Review_Text}}</p>
+{{/each}}
+
+<h2>Violations</h2>
+
+{{#each comments}}
+  <p>{{this.Comment_Text}}</p>
+{{/each}}
