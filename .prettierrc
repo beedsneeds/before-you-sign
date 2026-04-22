@@ -1,0 +1,16 @@
+{
+  "endOfLine": "lf",
+  "singleQuote": true,
+  "semi": true,
+  "trailingComma": "all",
+  "tabWidth": 2,
+  "printWidth": 100,
+  "overrides": [
+    {
+      "files": "*.html",
+      "options": {
+        "printWidth": 500
+      }
+    }
+  ]
+}
