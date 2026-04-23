@@ -18,7 +18,7 @@
     "dev": "tsx watch app.ts",
     "build": "tsc",
     "start": "node dist/app.js",
-    "seeddb": "tsx tasks/seed.ts",
+    "seeddb": "tsx data/seed/seed.ts",
     "format": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {
@@ -49,4 +49,3 @@
     "tsx": "^4.21.0"
   }
 }
-
