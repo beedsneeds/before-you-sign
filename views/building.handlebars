@@ -3,13 +3,16 @@
 <p>ID: {{building.BuildingID}}</p>
 
 <h2>Reviews</h2>
-
 {{#each reviews}}
-  <p>{{this.Review_Text}}</p>
+  <p>{{this.ReviewText}} ({{this.Rating}})</p>
 {{/each}}
 
 <h2>Violations</h2>
+{{#each violations}}
+  <p>{{this.NOVDescription}} - {{this.ViolationStatus}}</p>
+{{/each}}
 
+<h2>Comments</h2>
 {{#each comments}}
-  <p>{{this.Comment_Text}}</p>
+  <p>{{this.CommentText}}</p>
 {{/each}}

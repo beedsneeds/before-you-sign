@@ -10,7 +10,7 @@ const constructorMethod = (app) => {
   // mount router (needed for building route to work)
   app.use('/', router);
 
-  app.use('*', (req, res) => {
+  app.use((req, res) => {
     res.status(404).render('error', { title: 'Error', error: 'Page not found' });
   });
 };
@@ -20,22 +20,22 @@ router.get('/building/:id', async (req, res) => {
   // get the id
   const id = req.params.id;
 
-  // RC fake temp data
+  // fake data
   const building = {
-    BuildingID: id, // use dynamic id
-    Address: '123 Virginia Court, New York, NY',
-    AvgRating: 5.0,
-    ReviewsCount: 5,
+    BuildingID: id,
+    Address: 'TEMP ADDRESS',
+    AvgRating: 0,
+    ReviewsCount: 0,
   };
 
   const reviews = [
-    { ReviewText: 'Well maintained', Rating: 4 }, // fixed key
-    { ReviewText: 'Bad management', Rating: 1 }, // fixed key
+    { ReviewText: 'Well maintained', Rating: 4 },
+    { ReviewText: 'Bad management', Rating: 1 },
   ];
 
   const violations = [{ NOVDescription: 'Bedbugs', ViolationStatus: 'Open' }];
 
-  const comments = [{ CommentText: 'I had the same experience' }]; // fixed key
+  const comments = [{ CommentText: 'I had the same experience' }];
 
   res.render('building', {
     building,
