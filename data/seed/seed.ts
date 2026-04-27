@@ -38,7 +38,8 @@ const main = async () => {
       email: 'sudo@gmail.com',
       hashedPassword: await hashPassword('superpassword'),
       isAdmin: true,
-      savedBuildings: [building1Id, building2Id],
+      activityScore: 10,
+      savedBuildings: [{ building1Id: true }, { building2Id: false }], //joined notifications with saved buildings for simplicity
       reviewIds: [review1Id],
       commentIds: [comment1Id],
     },
@@ -49,6 +50,8 @@ const main = async () => {
       email: 'normal@gmail.com',
       hashedPassword: await hashPassword('normalpassword'),
       isAdmin: false,
+      activityScore: 5,
+      notifications: [{ building2Id: true }], //separate field for notifications
       savedBuildings: [building2Id],
       reviewIds: [review2Id],
       commentIds: [comment2Id],
