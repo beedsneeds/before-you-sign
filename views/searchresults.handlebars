@@ -1,0 +1,46 @@
+<h1>Search Results</h1>
+
+{{#if error}}
+  <p class='error'>{{error}}</p>
+{{/if}}
+
+{{#if query}}
+  <p>Showing results for: <strong>{{query}}</strong></p>
+{{/if}}
+
+<hr />
+
+{{#if results.length}}
+
+  <div class='results-container'>
+    {{#each results}}
+      <div class='result-card'>
+
+        <h2>{{this.address}}</h2>
+
+        <p><strong>Borough:</strong> {{this.borough}}</p>
+        <p><strong>BIN:</strong> {{this.bin}}</p>
+
+        <p><strong>Rating:</strong>
+          {{#if this.avgRating}}
+            {{this.avgRating}}
+          {{else}}
+            N/A
+          {{/if}}
+        </p>
+
+        <p><strong>Reviews:</strong> {{this.reviewCount}}</p>
+
+        <a href='/building/{{this._id}}' class='view-btn'>
+          View Building
+        </a>
+
+      </div>
+    {{/each}}
+  </div>
+
+{{else}}
+  {{#unless error}}
+    <p>No buildings found matching your search.</p>
+  {{/unless}}
+{{/if}}
