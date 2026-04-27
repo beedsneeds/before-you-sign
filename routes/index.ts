@@ -5,7 +5,7 @@ import { Express, Request, Response } from "express";
 const constructorMethod = (app: Express) => {
   app.use("/admin", adminRoutes);
 
-  app.use("*", (req: Request, res: Response) => {
+  app.use((req: Request, res: Response) => {
     res.status(404).render("error", { title: "Error", error: "Page not found" });
   });
 };
