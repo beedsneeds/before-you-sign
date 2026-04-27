@@ -1,25 +1,99 @@
-<h1>{{Edit Existing Building}}</h1>
+<h1>Edit Existing Building</h1>
 
-{{! TODO: search building data and populate form fields }}
+{{#if error}}
+  <p>{{error}}</p>
+{{/if}}
+
+{{#if success}}
+  <p>{{success}}</p>
+{{/if}}
+
+<h2>Look Up Building</h2>
+
 <form action="/admin/edit" method="POST">
   <div>
     <label for="BuildingID">Building ID:</label>
-    <input type="number" id="BuildingID" name="BuildingID" required>
+    <input
+      type="number"
+      id="BuildingID"
+      name="BuildingID"
+      value="{{formData.BuildingID}}"
+      required
+    >
   </div>
 
   <div>
-    <label for="Address">New Address:</label>
-    <input type="text" id="Address" name="Address">
-  </div>
-
-  <div>
-    <label for="binNumber">New BIN Number:</label>
-    <input type="number" id="binNumber" name="binNumber">
-  </div>
-
-  <div>
-    <button type="submit">Update Building</button>
+    <button type="submit">Find Building</button>
   </div>
 </form>
+
+{{#if building}}
+  <h2>Edit Building Data</h2>
+
+  <form action="/admin/edit/submit" method="POST">
+    <div>
+      <label for="editBuildingID">Building ID:</label>
+      <input
+        type="number"
+        id="editBuildingID"
+        name="BuildingID"
+        value="{{building.BuildingID}}"
+        readonly
+      >
+    </div>
+
+    <div>
+      <label for="Address">Address:</label>
+      <input
+        type="text"
+        id="Address"
+        name="Address"
+        value="{{building.Address}}"
+        required
+      >
+    </div>
+
+    <div>
+      <label for="binNumber">BIN Number:</label>
+      <input
+        type="number"
+        id="binNumber"
+        name="binNumber"
+        value="{{building.binNumber}}"
+        required
+      >
+    </div>
+
+    <div>
+      <label for="AvgRating">Average Rating:</label>
+      <input
+        type="number"
+        id="AvgRating"
+        name="AvgRating"
+        step="0.1"
+        min="0"
+        max="5"
+        value="{{building.AvgRating}}"
+        required
+      >
+    </div>
+
+    <div>
+      <label for="ReviewsCount">Reviews Count:</label>
+      <input
+        type="number"
+        id="ReviewsCount"
+        name="ReviewsCount"
+        min="0"
+        value="{{building.ReviewsCount}}"
+        required
+      >
+    </div>
+
+    <div>
+      <button type="submit">Update Building</button>
+    </div>
+  </form>
+{{/if}}
 
 <p><a href="/admin">Back to Admin Dashboard</a></p>

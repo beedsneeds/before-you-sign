@@ -1,5 +1,13 @@
 {{! Form to add a building }}
-<h1>{{Add Building Data}}</h1>
+<h1>Add Building Data</h1>
+
+{{#if error}}
+  <p>{{error}}</p>
+{{/if}}
+
+{{#if success}}
+  <p>{{success}}</p>
+{{/if}}
 
 <form action="/admin/add" method="POST">
   <div>
