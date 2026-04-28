@@ -1,28 +1,8 @@
-import { MongoClient, Db } from "mongodb";
+import mongoose from "mongoose";
 import { mongoConfig } from "./settings.js";
 
-let _connection: MongoClient | undefined = undefined;
-let _db: Db | undefined = undefined;
-
-const dbConnection = async (): Promise<Db> => {
-  if (!_connection) {
-    _connection = await MongoClient.connect(mongoConfig.serverUrl);
-    _db = _connection.db(mongoConfig.database);
-  }
-
-  if (!_db) {
-    throw new Error("Could not establish a database connection");
-  }
-
-  return _db;
+export const connect = async (): Promise<void> => {
+  await mongoose.connect(mongoConfig.serverUrl, { dbName: mongoConfig.database });
 };
 
-const closeConnection = async (): Promise<void> => {
-  if (_connection) {
-    await _connection.close();
-    _connection = undefined;
-    _db = undefined;
-  }
-};
-
-export { dbConnection, closeConnection };
+export const disconnect = (): Promise<void> => mongoose.disconnect();
