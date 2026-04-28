@@ -1,0 +1,18 @@
+<nav class="nav-links">
+    
+    Before You Sign
+
+  {{#if loggedIn}}
+    <a id="home" href="/home">Home</a>
+    <a id="profile" href="/profile">Profile</a>
+    
+    {{#if isAdmin}}
+      <a id="adminDashboard" href="/admin">Admin Dashboard</a>
+    {{/if}}
+
+    <a id="signOut" href="/signOut">Sign Out</a>
+  {{else}}
+    <a id="signUp" href="/signUp">Sign Up</a>
+    <a id="signIn" href="/signIn">Sign In</a>
+  {{/if}}
+</nav>

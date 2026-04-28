@@ -1,14 +1,50 @@
 <h1>Delete Building</h1>
 
+{{#if error}}
+  <p>{{error}}</p>
+{{/if}}
+
+{{#if success}}
+  <p>{{success}}</p>
+{{/if}}
+
+<h2>Look Up Building</h2>
+
 <form action="/admin/delete" method="POST">
   <div>
     <label for="BuildingID">Building ID:</label>
-    <input type="number" id="BuildingID" name="BuildingID" required>
+    <input
+      type="number"
+      id="BuildingID"
+      name="BuildingID"
+      value="{{formData.BuildingID}}"
+      required
+    >
   </div>
 
   <div>
-    <button type="submit">Delete Building</button>
+    <button type="submit">Find Building</button>
   </div>
 </form>
+
+{{#if building}}
+  <h2>Confirm Delete</h2>
+
+  <p><strong>Building ID:</strong> {{building.BuildingID}}</p>
+  <p><strong>Address:</strong> {{building.Address}}</p>
+  <p><strong>BIN Number:</strong> {{building.binNumber}}</p>
+  <p><strong>Average Rating:</strong> {{building.AvgRating}}</p>
+  <p><strong>Reviews Count:</strong> {{building.ReviewsCount}}</p>
+
+  <form action="/admin/delete/confirm" method="POST">
+    <input
+      type="hidden"
+      name="BuildingID"
+      value="{{building.BuildingID}}"
+    >
+
+    <button type="submit">Confirm Delete</button>
+  </form>
+{{/if}}
 
 <p><a href="/admin">Back to Admin Dashboard</a></p>
