@@ -35,7 +35,7 @@ export const createUser = async ({
 
   const checkedFirstName = checkString(firstName, 2, 50, /[^a-zA-Z]/);
   const checkedLastName = checkString(lastName, 2, 50, /[^a-zA-Z]/);
-  const checkedEmail = checkString(email, 5, 255, /^[^\s@]+@[^\s@]+\.[^\s@]+$/).toLowerCase();
+  const checkedEmail = checkString(email, 5, 255, /[^\w@.\-]/i).toLowerCase();
   const checkedPassword = checkString(password, 8, undefined, /\s/);
 
   if (
@@ -88,7 +88,7 @@ export const checkUser = async (email: string, password: string) => {
     throw 'Error: Both email and password must be provided.';
   }
 
-  const checkedEmail = checkString(email, 5, 255, /^[^\s@]+@[^\s@]+\.[^\s@]+$/).toLowerCase();
+  const checkedEmail = checkString(email, 5, 255, /[^\w@.\-]/i).toLowerCase();
   const checkedPassword = checkString(password, 8, undefined, /\s/);
 
   const userCollection = await users();
