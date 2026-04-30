@@ -2,10 +2,10 @@ import express from 'express';
 import exphbs from 'express-handlebars';
 import session from 'express-session';
 import configRoutes from './routes/index.js';
-import { connect } from "./data/config/mongoConnection.js";
+//import { connect } from './data/config/mongoConnection.js';
 
 // Top level await for the db conn (or should we put this in main?)
-await connect();
+//await connect();
 
 const app = express();
 
@@ -51,12 +51,16 @@ app.use((req, res, next) => {
   next();
 });
 
+/*
 //middleware to protect admin route
 app.use('/admin', (req, res, next) => {
   const sessionInfo = req.session as any;
 
   if (!sessionInfo.user) {
-    return res.redirect('/login');
+    return res.render('error', {
+      title: 'Error',
+      error: 'Log in to view admin',
+    });
   }
 
   if (sessionInfo.user.isAdmin !== true) {
@@ -70,9 +74,7 @@ app.use('/admin', (req, res, next) => {
 
   next();
 });
-
-
-
+*/
 app.engine('handlebars', exphbs.engine({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
 configRoutes(app);
