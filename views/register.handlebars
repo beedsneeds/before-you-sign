@@ -1,0 +1,37 @@
+<h1>Register</h1>
+
+{{#if error}}
+  <p style='color: red;'>{{error}}</p>
+{{/if}}
+
+<form action='/register' method='POST'>
+  <label for='firstName'>First Name:</label>
+  <input type='text' name='firstName' id='firstName' value='{{firstName}}' required />
+
+  <br />
+
+  <label for='lastName'>Last Name:</label>
+  <input type='text' name='lastName' id='lastName' value='{{lastName}}' required />
+
+  <br />
+
+  <label for='email'>Email:</label>
+  <input type='email' name='email' id='email' value='{{email}}' required />
+
+  <br />
+
+  <label for='password'>Password:</label>
+  <input type='password' name='password' id='password' required />
+
+  <br />
+
+  <button type='submit'>Register</button>
+</form>
+
+<p>
+  Already have an account?
+  <a href='/signin'>Sign in here</a>
+</p>
+<p>
+  <a href='/'>Home</a>
+</p>
