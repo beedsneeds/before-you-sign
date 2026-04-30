@@ -1,0 +1,49 @@
+{{!
+GET /
+Required ids/elements from the spec:
+<h1 id="appTitle">Lab 10 - Reading Club Portal</h1>
+<p id="siteDescription">...</p>
+
+If NOT logged in:
+<a id="registerlink" href="/register">Register Here</a>
+<a id="signinlink" href="/signin">Sign In Here</a>
+
+If logged in and ONLY a normal member:
+<a id="memberlink" href="/member">Member Page</a>
+
+If logged in and a manager:
+<a id="memberlink" href="/member">Member Page</a>
+<a id="managerlink" href="/manager">Manager Page</a>
+
+Also include a footer with your name and CWID.
+}}
+
+<main>
+  <h1 id='appTitle'>Before You Sign</h1>
+
+  <p id='siteDescription'>Welcome to before you sign, your one-stop-shop for all your renting
+    questions!</p>
+
+  {{#unless membershipLevel}}
+    <p>
+      <a id='registerlink' href='/register'>Register Here</a>
+    </p>
+    <p>
+      <a id='signinlink' href='/signin'>Sign In Here</a>
+    </p>
+  {{/unless}}
+
+  {{#if membershipLevel}}
+    <p>
+      <a id='memberlink' href='/member'>Member Page</a>
+    </p>
+    {{#if isManager}}
+      <p>
+        <a id='managerlink' href='/manager'>Manager Page</a>
+      </p>
+    {{/if}}
+  {{/if}}
+
+  <footer id='siteFooter'>
+  </footer>
+</main>
