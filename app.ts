@@ -2,6 +2,10 @@ import express from "express";
 import exphbs from "express-handlebars";
 import session from "express-session";
 import configRoutes from "./routes/index.js";
+import { connect } from "./data/config/mongoConnection.js";
+
+// Top level await for the db conn (or should we put this in main?)
+await connect();
 
 const app = express();
 
