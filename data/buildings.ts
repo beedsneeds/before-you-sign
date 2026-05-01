@@ -1,4 +1,5 @@
-//import { buildings } from "./config/mongoCollections.js";
+// mongoose switch import
+import { BuildingModel } from './models/Building.js';
 
 const checkBuildingID = (buildingID: any) => {
   if (!buildingID) throw 'Building ID must be supplied';
@@ -84,23 +85,18 @@ const checkReviewsCount = (reviewsCount: any) => {
 
 export const getBuildingById = async (buildingID: any) => {
   buildingID = checkBuildingID(buildingID);
-  /*
-  const buildingCollection = await buildings();
 
-  const building = await buildingCollection.findOne({
-    BuildingID: buildingID,
+  const building = await BuildingModel.findOne({
+    BIN: Number(buildingID),
   });
-
-  throw 'DB not connected yet';
+  console.log('SEARCH BIN:', buildingID);
+  console.log('FOUND:', building);
 
   if (!building) throw 'No building found with that Building ID';
 
-  return building;
-  */
- //TEMP UNTIL MONGOOSE CONNECTION IS DONE
- throw 'Db not connected yet'
+  return building.toObject();
 };
-/*
+
 export const updateBuildingById = async (
   buildingID: any,
   address: any,
@@ -114,40 +110,37 @@ export const updateBuildingById = async (
   avgRating = checkRating(avgRating);
   reviewsCount = checkReviewsCount(reviewsCount);
 
-  const buildingCollection = await buildings();
+  const updated = await BuildingModel.findOneAndUpdate(
+    { BIN: Number(buildingID) },
 
-  const updateInfo = await buildingCollection.updateOne(
-    { BuildingID: buildingID },
     {
-      $set: {
-        Address: address,
-        binNumber: binNumber,
-        AvgRating: avgRating,
-        ReviewsCount: reviewsCount,
-      },
+      address: address,
+      BIN: Number(binNumber),
+      avgRating: avgRating,
+      reviewsCount: reviewsCount,
     },
+    { new: true },
   );
 
-  if (!updateInfo.acknowledged) {
+  console.log('updated:', updated);
+
+  if (!updated) {
     throw 'Could not update building';
   }
 
-  return await getBuildingById(buildingID);
+  return updated.toObject();
 };
 
 export const deleteBuildingById = async (buildingID: any) => {
   buildingID = checkBuildingID(buildingID);
 
-  const buildingCollection = await buildings();
-
-  const deleteInfo = await buildingCollection.deleteOne({
-    BuildingID: buildingID,
+  const deleted = await BuildingModel.findOneAndDelete({
+    BIN: Number(buildingID),
   });
 
-  if (deleteInfo.deletedCount === 0) {
-    throw 'Could not delete building';
+  if (!deleted) {
+    throw 'Unable to delete building';
   }
 
   return true;
 };
-*/

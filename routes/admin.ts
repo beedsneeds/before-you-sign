@@ -3,16 +3,7 @@
 import { Router } from 'express';
 import xss from 'xss';
 
-/*
-import {
-  getBuildingById,
-  updateBuildingById,
-  deleteBuildingById,
-} from "../data/buildings.js";
-
-*/
-
-import { getBuildingById } from '../data/buildings.js';
+import { getBuildingById, updateBuildingById, deleteBuildingById } from '../data/buildings.js';
 
 const router = Router();
 
@@ -67,26 +58,18 @@ router.post('/edit/submit', async (req, res) => {
   };
 
   try {
-    /*
     const updatedBuilding = await updateBuildingById(
       buildingData.BuildingID,
       buildingData.Address,
       buildingData.binNumber,
       buildingData.AvgRating,
-      buildingData.ReviewsCount
+      buildingData.ReviewsCount,
     );
-
-    return res.render("admin/editBuilding", {
-      title: "Edit Building",
-      success: "Building updated successfully.",
-      building: updatedBuilding,
-    });
-    */
 
     return res.render('admin/editBuilding', {
       title: 'Edit Building',
-      error: 'Update not available yet',
-      building: buildingData,
+      message: 'Building was deleted',
+      building: updatedBuilding,
     });
   } catch (e) {
     return res.status(400).render('admin/editBuilding', {
@@ -127,17 +110,12 @@ router.post('/delete/confirm', async (req, res) => {
 
   try {
     if (!buildingID) throw 'Building ID must be supplied';
-    /*
+
     await deleteBuildingById(buildingID);
 
-    return res.render("admin/removeBuilding", {
-      title: "Delete Building",
-      success: "Building deleted successfully.",
-    });*/
-    // TEMP until DB is connected
     return res.render('admin/removeBuilding', {
       title: 'Delete Building',
-      error: 'Delete not available yet',
+      success: 'Building deleted successfully.',
     });
   } catch (e) {
     return res.status(400).render('admin/removeBuilding', {

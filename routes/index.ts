@@ -1,8 +1,7 @@
-import { Router, Express, Request, Response} from "express";
+import { Router, Express, Request, Response } from 'express';
 import adminRoutes from './admin.js';
 
 const router = Router();
-
 
 //route for admin added for preliminary structure, change and add rest as needed
 const constructorMethod = (app: Express) => {
@@ -12,7 +11,7 @@ const constructorMethod = (app: Express) => {
   app.use('/', router);
 
   app.use((req: Request, res: Response) => {
-    res.status(404).render("error", { title: "Error", error: "Page not found" });
+    res.status(404).render('error', { title: 'Error', error: 'Page not found' });
   });
 };
 
