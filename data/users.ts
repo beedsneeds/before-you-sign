@@ -33,8 +33,8 @@ export const createUser = async ({
     throw 'Error: All fields must be provided.';
   }
 
-  const checkedFirstName = checkString(firstName, 2, 50, /[^a-zA-Z]/);
-  const checkedLastName = checkString(lastName, 2, 50, /[^a-zA-Z]/);
+  const checkedFirstName = checkString(firstName, 2, 50, /[^a-zA-Z ]/);
+  const checkedLastName = checkString(lastName, 2, 50, /[^a-zA-Z ]/);
   const checkedEmail = checkString(email, 5, 255, /[^\w@.\-]/i).toLowerCase();
   const checkedPassword = checkString(password, 8, undefined, /\s/);
 
