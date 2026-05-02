@@ -1,50 +1,54 @@
 // mongoose switch import
-import { BuildingModel } from './models/Building.js';
+import { BuildingModel, type Building } from './models/Building.js';
 
-const checkBuildingID = (buildingID: any) => {
-  if (!buildingID) throw 'Building ID must be supplied';
+const checkBuildingID = (buildingID: string | number): number => {
+  if (buildingID === undefined || buildingID === null || buildingID === '') {
+    throw 'Building ID must be supplied';
+  }
 
   if (typeof buildingID === 'string') {
     buildingID = buildingID.trim();
   }
 
-  buildingID = Number(buildingID);
 
-  if (isNaN(buildingID)) throw 'Building ID must be a number';
-  if (!Number.isInteger(buildingID)) throw 'Building ID must be a whole number';
-  if (buildingID <= 0) throw 'Building ID must be positive';
+  const id = Number(buildingID);
 
-  return buildingID;
+  if (isNaN(id)) throw 'Building ID must be a number';
+  if (!Number.isInteger(id)) throw 'Building ID must be a whole number';
+  if (id <= 0) throw 'Building ID must be positive';
+
+  return id;
 };
 
-const checkAddress = (address: any) => {
+const checkAddress = (address: unknown): string => {
   if (!address) throw 'Address must be supplied';
   if (typeof address !== 'string') throw 'Address must be a string';
 
-  address = address.trim();
+  const trimmed = address.trim();
 
-  if (address.length === 0) throw 'Address cannot be empty';
+  if (trimmed.length === 0) throw 'Address cannot be empty';
 
-  return address;
+  return trimmed;
 };
 
-const checkBIN = (binNumber: any) => {
-  if (!binNumber) throw 'BIN number must be supplied';
-
+const checkBIN = (binNumber: string | number): number => {
+  if (binNumber === undefined || binNumber === null || binNumber === '') {
+    throw 'BIN number must be supplied';
+  }
   if (typeof binNumber === 'string') {
     binNumber = binNumber.trim();
   }
 
-  binNumber = Number(binNumber);
+  const bin = Number(binNumber);
 
-  if (isNaN(binNumber)) throw 'BIN number must be a number';
-  if (!Number.isInteger(binNumber)) throw 'BIN number must be a whole number';
-  if (binNumber <= 0) throw 'BIN number must be positive';
+  if (isNaN(bin)) throw 'BIN number must be a number';
+  if (!Number.isInteger(bin)) throw 'BIN number must be a whole number';
+  if (bin <= 0) throw 'BIN number must be positive';
 
-  return binNumber;
+  return bin;
 };
 
-const checkRating = (avgRating: any) => {
+const checkRating = (avgRating: string | number): number => {
   if (avgRating === undefined || avgRating === null || avgRating === '') {
     throw 'Average rating must be supplied';
   }
@@ -53,17 +57,17 @@ const checkRating = (avgRating: any) => {
     avgRating = avgRating.trim();
   }
 
-  avgRating = Number(avgRating);
+  const rating = Number(avgRating);
 
-  if (isNaN(avgRating)) throw 'Average rating must be a number';
-  if (avgRating < 0 || avgRating > 5) {
+  if (isNaN(rating)) throw 'Average rating must be a number';
+  if (rating < 0 || rating > 5) {
     throw 'Average rating must be between 0 and 5';
   }
 
-  return avgRating;
+  return rating;
 };
 
-const checkReviewsCount = (reviewsCount: any) => {
+const checkReviewsCount = (reviewsCount: string | number): number => {
   if (reviewsCount === undefined || reviewsCount === null || reviewsCount === '') {
     throw 'Reviews count must be supplied';
   }
@@ -72,18 +76,18 @@ const checkReviewsCount = (reviewsCount: any) => {
     reviewsCount = reviewsCount.trim();
   }
 
-  reviewsCount = Number(reviewsCount);
+  const count = Number(reviewsCount);
 
-  if (isNaN(reviewsCount)) throw 'Reviews count must be a number';
-  if (!Number.isInteger(reviewsCount)) {
-    throw 'Reviews count must be a whole number';
+  if (isNaN(count)) throw 'Reviews count must be number';
+  if (!Number.isInteger(count)) {
+    throw 'Reviews count must be whole number';
   }
-  if (reviewsCount < 0) throw 'Reviews count cannot be negative';
+  if (count < 0) throw 'Reviews count cannot be negative';
 
-  return reviewsCount;
+  return count;
 };
 
-export const getBuildingById = async (buildingID: any) => {
+export const getBuildingById = async (buildingID: string | number): Promise<Building> => {
   buildingID = checkBuildingID(buildingID);
 
   const building = await BuildingModel.findOne({
@@ -98,12 +102,12 @@ export const getBuildingById = async (buildingID: any) => {
 };
 
 export const updateBuildingById = async (
-  buildingID: any,
-  address: any,
-  binNumber: any,
-  avgRating: any,
-  reviewsCount: any,
-) => {
+  buildingID: string | number,
+  address: string,
+  binNumber: string | number,
+  avgRating: string | number,
+  reviewsCount: string | number,
+): Promise<Building> => {
   buildingID = checkBuildingID(buildingID);
   address = checkAddress(address);
   binNumber = checkBIN(binNumber);
@@ -131,7 +135,7 @@ export const updateBuildingById = async (
   return updated.toObject();
 };
 
-export const deleteBuildingById = async (buildingID: any) => {
+export const deleteBuildingById = async (buildingID: string | number): Promise<boolean> => {
   buildingID = checkBuildingID(buildingID);
 
   const deleted = await BuildingModel.findOneAndDelete({
