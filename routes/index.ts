@@ -1,5 +1,6 @@
 import { Router, Express, Request, Response } from 'express';
 import adminRoutes from './admin.js';
+import { getBuildingById } from '../data/buildings.js';
 
 const router = Router();
 
@@ -15,19 +16,20 @@ const constructorMethod = (app: Express) => {
   });
 };
 
+//home
+router.get('/', async (req, res) => {
+  res.render('home', { title: 'Home' });
+});
+
 // building route
 router.get('/building/:id', async (req, res) => {
   // get the id
   const id = req.params.id;
 
-  // fake data
-  const building = {
-    BuildingID: id,
-    Address: 'TEMP ADDRESS',
-    AvgRating: 0,
-    ReviewsCount: 0,
-  };
+  const building = await getBuildingById(id);
 
+  //////////////////////////////////////////////////////////////////
+  //TEMP: reviews,violations, comments HARDCODED RN
   const reviews = [
     { ReviewText: 'Well maintained', Rating: 4 },
     { ReviewText: 'Bad management', Rating: 1 },
