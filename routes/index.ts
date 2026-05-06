@@ -4,6 +4,8 @@ import { getBuildingById } from '../data/buildings.js';
 
 import { getReviewsByBuildingId } from '../data/reviews.js';
 import { getCommentsByBuildingId } from '../data/comments.js';
+import { addComment } from '../data/comments.js';
+import { addReview } from '../data/reviews.js';
 
 const router = Router();
 
@@ -53,12 +55,22 @@ router.get('/building/:id', async (req, res) => {
 router.post('/building/:id/review', async (req, res) => {
   const id = req.params.id;
 
+  const building = await getBuildingById(id);
+  const buildingId = (building as any)._id;
+
+  await addReview(buildingId, req.body.reviewText, Number(req.body.rating));
+
   res.redirect(`/building/${id}?reviewSubmitted=true`);
 });
 
 //coment
 router.post('/building/:id/comment', async (req, res) => {
   const id = req.params.id;
+
+  const building = await getBuildingById(id);
+  const buildingId = (building as any)._id;
+
+  await addComment(buildingId, req.body.commentText);
 
   res.redirect(`/building/${id}?commentSubmitted=true`);
 });
