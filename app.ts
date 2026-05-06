@@ -1,8 +1,8 @@
-import express from "express";
-import exphbs from "express-handlebars";
-import session from "express-session";
-import configRoutes from "./routes/index.js";
-import { connect } from "./data/config/mongoConnection.js";
+import express from 'express';
+import exphbs from 'express-handlebars';
+import session from 'express-session';
+import configRoutes from './routes/index.js';
+import { connect } from './data/config/mongoConnection.js';
 
 // Top level await for the db conn (or should we put this in main?)
 await connect();
@@ -12,34 +12,31 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/public", express.static("public"));
-
+app.use('/public', express.static('public'));
 
 app.use(
   session({
-    name: "BeforeYouSignAuthState",
-    secret: "some secret string!",
+    name: 'BeforeYouSignAuthState',
+    secret: 'some secret string!',
     resave: false,
     saveUninitialized: false,
-  })
+  }),
 );
 
-//TEMPORARY LOGGING MIDDLEWARE, REMOVE OR MODIFY AS NEEDED 
+//TEMPORARY LOGGING MIDDLEWARE, REMOVE OR MODIFY AS NEEDED
 app.use((req, res, next) => {
   const sessionInfo = req.session as any;
-  let authenticationMessage = "Non-Authenticated";
+  let authenticationMessage = 'Non-Authenticated';
 
   if (sessionInfo.user) {
     if (sessionInfo.user.isAdmin === true) {
-      authenticationMessage = "Authenticated Admin";
+      authenticationMessage = 'Authenticated Admin';
     } else {
-      authenticationMessage = "Authenticated User";
+      authenticationMessage = 'Authenticated User';
     }
   }
 
-  console.log(
-    `(${authenticationMessage})`
-  );
+  console.log(`(${authenticationMessage})`);
 
   next();
 });
@@ -54,32 +51,34 @@ app.use((req, res, next) => {
   next();
 });
 
+/*
 //middleware to protect admin route
-app.use("/admin", (req, res, next) => {
+app.use('/admin', (req, res, next) => {
   const sessionInfo = req.session as any;
 
   if (!sessionInfo.user) {
-    return res.redirect("/login");
+    return res.render('error', {
+      title: 'Error',
+      error: 'Log in to view admin',
+    });
   }
 
   if (sessionInfo.user.isAdmin !== true) {
-    return res.status(403).render("error", {
-      title: "Error",
-      error: "You do not have permission to view the admin dashboard.",
-      link: "/",
-      linkText: "Return to the home page",
+    return res.status(403).render('error', {
+      title: 'Error',
+      error: 'You do not have permission to view the admin dashboard.',
+      link: '/',
+      linkText: 'Return to the home page',
     });
   }
 
   next();
 });
-
-
-app.engine("handlebars", exphbs.engine());
-app.set("view engine", "handlebars");
+*/
+app.engine('handlebars', exphbs.engine({ defaultLayout: 'main' }));
+app.set('view engine', 'handlebars');
 configRoutes(app);
 
 app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
+  console.log('Server running on http://localhost:3000');
 });
-

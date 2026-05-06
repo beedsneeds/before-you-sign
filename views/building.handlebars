@@ -1,0 +1,20 @@
+<h1>{{building.address}}</h1>
+<p>ID: {{building.BIN}}</p>
+
+<p>Avg Rating: {{building.avgRating}}</p>
+<p>Reviews Count: {{building.reviewsCount}}</p>
+
+<h2>Reviews</h2>
+{{#each reviews}}
+  <p>{{this.ReviewText}} ({{this.Rating}})</p>
+{{/each}}
+
+<h2>Violations</h2>
+{{#each violations}}
+  <p>{{this.NOVDescription}} - {{this.ViolationStatus}}</p>
+{{/each}}
+
+<h2>Comments</h2>
+{{#each comments}}
+  <p>{{this.CommentText}}</p>
+{{/each}}

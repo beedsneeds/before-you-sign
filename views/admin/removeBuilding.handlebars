@@ -30,21 +30,21 @@
 {{#if building}}
   <h2>Confirm Delete</h2>
 
-  <p><strong>Building ID:</strong> {{building.BuildingID}}</p>
-  <p><strong>Address:</strong> {{building.Address}}</p>
-  <p><strong>BIN Number:</strong> {{building.binNumber}}</p>
-  <p><strong>Average Rating:</strong> {{building.AvgRating}}</p>
-  <p><strong>Reviews Count:</strong> {{building.ReviewsCount}}</p>
+  <p><strong>Building ID:</strong> {{building.BIN}}</p>
+  <p><strong>Address:</strong> {{building.address}}</p>
+  <p><strong>BIN Number:</strong> {{building.BIN}}</p>
+  <p><strong>Average Rating:</strong> {{building.avgRating}}</p>
+  <p><strong>Reviews Count:</strong> {{building.reviewsCount}}</p>
 
-  <form action="/admin/delete/confirm" method="POST">
-    <input
-      type="hidden"
-      name="BuildingID"
-      value="{{building.BuildingID}}"
-    >
+ <form action="/admin/delete/confirm" method="POST">
+  <input
+    type="hidden"
+    name="BuildingID"
+    value="{{building.BIN}}"
+  />
 
-    <button type="submit">Confirm Delete</button>
-  </form>
+  <button type="submit">Confirm Delete</button>
+</form>
 {{/if}}
 
 <p><a href="/admin">Back to Admin Dashboard</a></p>
