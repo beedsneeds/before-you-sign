@@ -8,11 +8,13 @@ import { getCommentsByBuildingId } from '../data/comments.js';
 import { addComment } from '../data/comments.js';
 import { addReview } from '../data/reviews.js';
 import { getViolationsByBuildingId } from '../data/violations.js';
+import searchRoutes from './search.js';
 
 const router = Router();
 
 //route for admin added for preliminary structure, change and add rest as needed
 const constructorMethod = (app: Express) => {
+  app.use('/', searchRoutes);
   app.use('/admin', adminRoutes);
   app.use('/', authRoutes);
 
