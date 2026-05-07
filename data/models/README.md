@@ -12,7 +12,7 @@ This contains only those fields that the client can send, if there's any fields 
 const parsed = UserInputSchema.safeParse(req.body);
 // parsed: { success: true; data: User } | { success: false; error: z.ZodError }
 if (!parsed.success) {
-  // https://zod.dev/error-formatting?id=zflattenerror
+  // https://zod.dev/error-formatting?id=zprettifyerror#zprettifyerror
   // Don't have to rewrite code for error messages
 }
 // Here, parsed.data: User
