@@ -10,7 +10,6 @@ const checkBuildingID = (buildingID: string | number): number => {
     buildingID = buildingID.trim();
   }
 
-
   const id = Number(buildingID);
 
   if (isNaN(id)) throw 'Building ID must be a number';

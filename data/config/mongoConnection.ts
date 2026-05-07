@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const mongoConfig = {
-  serverUrl: "mongodb://localhost:27017/",
-  database: "beforeYouSignDB",
+  serverUrl: 'mongodb://localhost:27017/',
+  database: 'beforeYouSignDB',
 };
 
 export const connect = async (): Promise<void> => {

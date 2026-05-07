@@ -1,15 +1,15 @@
-import { fileURLToPath } from "node:url";
-import { connect, disconnect } from "../config/mongoConnection.js";
-import { fetchViolations } from "./fetchViolations.js";
-import { ingestViolations } from "./ingestViolations.js";
+import { fileURLToPath } from 'node:url';
+import { connect, disconnect } from '../config/mongoConnection.js';
+import { fetchViolations } from './fetchViolations.js';
+import { ingestViolations } from './ingestViolations.js';
 
 const DEFAULT_INTERVAL_MS = 60 * 1000; // 1 minute or use x hours 60 * 60 * 1000
 
 // The first tick (T0) will ingest a violations.csv that already exists
-// This is to backfill data until a point where the cron job can begin its work 
+// This is to backfill data until a point where the cron job can begin its work
 // Ticks after that T1+ will fetch and overwrite violations.csv and once again ingest new csv
 export const tick = async (skipFetch: boolean) => {
-  const label = skipFetch ? "seed tick (ingest only)" : "cron tick";
+  const label = skipFetch ? 'seed tick (ingest only)' : 'cron tick';
   const start = Date.now();
   console.log(`[cron] ${label} at ${new Date().toISOString()}`);
   try {
@@ -27,7 +27,7 @@ export const startCron = async (intervalMs = DEFAULT_INTERVAL_MS) => {
   await tick(true);
   while (true) {
     console.log(`[cron] next tick in ${intervalMs / 1000}s`);
-    await new Promise(resolve => setTimeout(resolve, intervalMs));
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
     await tick(false);
   }
 };
