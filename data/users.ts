@@ -1,20 +1,6 @@
-import { users } from './config/mongoCollections.js';
+import { UserModel, type User } from './models/User.js';
 import bcrypt from 'bcrypt';
-import { ObjectId } from 'mongodb';
 import { checkString } from '../helpers/validation.js';
-
-interface User {
-  _id: ObjectId;
-  firstName: string;
-  lastName: string;
-  email: string;
-  hashedPassword: string;
-  isAdmin: boolean;
-  activityScore: number;
-  savedBuildings: [];
-  reviewIds: [];
-  commentIds: [];
-}
 
 export const createUser = async ({
   firstName,
@@ -46,18 +32,15 @@ export const createUser = async ({
     throw 'Error: Password must contain at least one uppercase letter, one number, and one special character.';
   }
 
-  const userCollection = await users();
-
-  const existing = await userCollection.findOne({
-    email: { $regex: `^${checkedEmail}$`, $options: 'i' },
+  const existing = await UserModel.findOne({
+    email: new RegExp(`^${checkedEmail}$`, 'i'),
   });
 
   if (existing) throw 'Error: An account with that email already exists.';
 
   const hashedPassword = await bcrypt.hash(checkedPassword, 12);
 
-  const newUser: User = {
-    _id: new ObjectId(),
+  const newUser = new UserModel({
     firstName: checkedFirstName,
     lastName: checkedLastName,
     email: checkedEmail,
@@ -67,19 +50,16 @@ export const createUser = async ({
     savedBuildings: [],
     reviewIds: [],
     commentIds: [],
-  };
+  });
 
-  const insertInfo = await userCollection.insertOne(newUser);
-  if (!insertInfo.acknowledged || !insertInfo.insertedId) {
-    throw 'Error: Could not create user.';
-  }
+  const savedUser = await newUser.save();
 
   return {
-    _id: insertInfo.insertedId,
-    firstName: newUser.firstName,
-    lastName: newUser.lastName,
-    email: newUser.email,
-    isAdmin: newUser.isAdmin,
+    _id: savedUser._id,
+    firstName: savedUser.firstName,
+    lastName: savedUser.lastName,
+    email: savedUser.email,
+    isAdmin: savedUser.isAdmin,
   };
 };
 
@@ -91,29 +71,24 @@ export const checkUser = async (email: string, password: string) => {
   const checkedEmail = checkString(email, 5, 255, /[^\w@.\-]/i).toLowerCase();
   const checkedPassword = checkString(password, 8, undefined, /\s/);
 
-  const userCollection = await users();
-
-  const user = await userCollection.findOne({
-    email: { $regex: `^${checkedEmail}$`, $options: 'i' },
+  const user = await UserModel.findOne({
+    email: new RegExp(`^${checkedEmail}$`, 'i'),
   });
 
   if (!user) throw 'Error: Either the email or password is invalid.';
 
-  const passwordMatch = await bcrypt.compare(checkedPassword, user['hashedPassword']);
+  const passwordMatch = await bcrypt.compare(checkedPassword, user.hashedPassword);
   if (!passwordMatch) throw 'Error: Either the email or password is invalid.';
 
-  await userCollection.updateOne(
-    { _id: user._id },
-    {
-      $inc: { activityScore: 1 },
-    },
-  );
+  await UserModel.findByIdAndUpdate(user._id, {
+    $inc: { activityScore: 1 },
+  });
 
   return {
     _id: user._id,
-    firstName: user['firstName'],
-    lastName: user['lastName'],
-    email: user['email'],
-    isAdmin: user['isAdmin'],
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    isAdmin: user.isAdmin,
   };
 };
