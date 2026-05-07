@@ -31,10 +31,24 @@
   <p>Review submitted!</p>
 {{/if}}
 
-<h2>Violations</h2>
-{{#each violations}}
-  <p>{{this.NOVDescription}} - {{this.ViolationStatus}}</p>
+<h2>Violations Summary</h2>
+
+<p>Class C (Most Severe): {{vioClassCounts.C}}</p>
+<p>Class B (Hazardous): {{vioClassCounts.B}}</p>
+<p>Class A (Non-Hazardous): {{vioClassCounts.A}}</p>
+<p>Class I (Information): {{vioClassCounts.I}}</p>
+
+<h3>Sample Violations</h3>
+
+<ul>
+{{#each sample_violations}}
+  <li>
+  Class {{this.class}}:
+  {{this.description}}
+  - {{this.violationStatus}}
+</li>
 {{/each}}
+</ul>
 
 <h2>Comments</h2>
 {{#each comments}}

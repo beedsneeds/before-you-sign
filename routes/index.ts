@@ -6,6 +6,7 @@ import { getReviewsByBuildingId } from '../data/reviews.js';
 import { getCommentsByBuildingId } from '../data/comments.js';
 import { addComment } from '../data/comments.js';
 import { addReview } from '../data/reviews.js';
+import { getViolationsByBuildingId } from '../data/violations.js';
 
 const router = Router();
 
@@ -34,7 +35,45 @@ router.get('/building/:id', async (req, res) => {
     const buildingId = (building as any)._id;
     const reviews = await getReviewsByBuildingId(buildingId);
     const comments = await getCommentsByBuildingId(buildingId);
-    const violations = [{ NOVDescription: 'Bedbugs', ViolationStatus: 'Open' }];
+    const violations = await getViolationsByBuildingId(buildingId);
+
+    //
+    const vioClassCounts = {
+      C: violations.filter((v) => v.class === 'C').length,
+      B: violations.filter((v) => v.class === 'B').length,
+      A: violations.filter((v) => v.class === 'A').length,
+      I: violations.filter((v) => v.class === 'I').length,
+    };
+    //sample of violations description, order or most severe to least
+    const sortedViolations = [];
+
+    for (const violation of violations) {
+      if (violation.class === 'C') {
+        sortedViolations.push(violation);
+      }
+    }
+
+    for (const violation of violations) {
+      if (violation.class === 'B') {
+        sortedViolations.push(violation);
+      }
+    }
+
+    for (const violation of violations) {
+      if (violation.class === 'A') {
+        sortedViolations.push(violation);
+      }
+    }
+
+    for (const violation of violations) {
+      if (violation.class === 'I') {
+        sortedViolations.push(violation);
+      }
+    }
+
+    const sample_violations = sortedViolations.slice(0, 5);
+
+    //Form submissions confirmations
     const review_confirm_submit = req.query['reviewSubmitted'];
     const comment_confirm_submit = req.query['commentSubmitted'];
 
@@ -43,6 +82,8 @@ router.get('/building/:id', async (req, res) => {
       reviews,
       violations,
       comments,
+      vioClassCounts,
+      sample_violations,
       review_confirm_submit,
       comment_confirm_submit,
     });
