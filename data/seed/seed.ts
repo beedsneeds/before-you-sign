@@ -34,7 +34,7 @@ const main = async () => {
       hashedPassword: await hashPassword("superpassword"),
       isAdmin: true,
       activityScore: 10,
-      savedBuildings: [{ building1Id: true }, { building2Id: false }], //joined notifications with saved buildings for simplicity
+      savedBuildings: [ building1Id ,  building2Id ], //joined notifications with saved buildings for simplicity
       reviewIds: [review1Id],
       commentIds: [comment2Id],
     },

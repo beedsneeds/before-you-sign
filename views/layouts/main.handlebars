@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang='en'>
   <head>
     <meta charset='utf-8' />
@@ -6,7 +7,12 @@
     <link rel='stylesheet' href='/public/css/sitestyles.css' />
   </head>
   <body>
-    {{{body}}}
+    {{> navbar}}
+
+    <main class='site-container'>
+      {{{body}}}
+    </main>
+
     <script src='/public/js/form_validate.js'></script>
   </body>
 </html>

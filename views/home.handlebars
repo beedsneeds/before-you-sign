@@ -1,11 +1,23 @@
-<main>
+<section class='home-page'>
+  <img src='/public/images/logo.png' alt='Before You Sign logo' class='home-logo' />
+
   <h1 id='appTitle'>Before You Sign</h1>
 
   <p id='siteDescription'>
-    Welcome to before you sign, your one-stop-shop for all your renting questions!
+    Welcome to Before You Sign, your one-stop shop for renting questions before you sign a lease.
   </p>
 
-  {{! NOT logged in }}
+  <form action='/search' method='GET' class='home-search-form'>
+    <label for='searchQuery' class='visually-hidden'>Search for a building</label>
+    <input
+      type='text'
+      name='query'
+      id='searchQuery'
+      placeholder='Search by address, building name, or BIN'
+    />
+    <input type='submit' value='Search' class='search-button' />
+  </form>
+
   {{#unless loggedIn}}
     <p>
       <a id='registerlink' href='/register'>Register Here</a>
@@ -15,7 +27,6 @@
     </p>
   {{/unless}}
 
-  {{! Logged in }}
   {{#if loggedIn}}
     <p>
       <a id='memberlink' href='/member'>Member Page</a>
@@ -23,16 +34,16 @@
 
     {{#if isAdmin}}
       <p>
-        <a id='managerlink' href='/manager'>Manager Page</a>
+        <a id='managerlink' href='/admin'>Admin Dashboard</a>
       </p>
     {{/if}}
 
-    {{! ✅ Sign Out link }}
     <p>
       <a id='signoutlink' href='/signout'>Sign Out</a>
     </p>
   {{/if}}
 
   <footer id='siteFooter'>
+    Check the building before you sign the lease.
   </footer>
-</main>
+</section>
