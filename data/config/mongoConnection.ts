@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
-import { mongoConfig } from "./settings.js";
+
+const mongoConfig = {
+  serverUrl: "mongodb://localhost:27017/",
+  database: "beforeYouSignDB",
+};
 
 export const connect = async (): Promise<void> => {
   await mongoose.connect(mongoConfig.serverUrl, { dbName: mongoConfig.database });

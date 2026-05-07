@@ -1,5 +1,9 @@
 # Before You Sign
 
+#### TODO
+
+- Pairwise evaluation of previous lab specs and relevance in their contribution to the project
+
 #### After a fetch:
 
 - Run `npm install` to install all deps

@@ -15,6 +15,8 @@ export const BuildingStoredSchema = BuildingInputSchema.extend({
     reviewsCount: z.number().int().nonnegative(), 
 })
 
+// violation ID list
+
 export type Building = z.infer<typeof BuildingStoredSchema>;
 
 const BuildingDbSchema = new Schema<Building>({
