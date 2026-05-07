@@ -45,8 +45,8 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   const sessionInfo = req.session as any;
 
-  res.locals.loggedIn = !!sessionInfo.user;
-  res.locals.isAdmin = sessionInfo.user && sessionInfo.user.isAdmin === true;
+  res.locals['loggedIn'] = !!sessionInfo.user;
+  res.locals['isAdmin'] = sessionInfo.user && sessionInfo.user.isAdmin === true;
 
   next();
 });

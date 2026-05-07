@@ -1,5 +1,6 @@
 import { Router, Express, Request, Response } from 'express';
 import adminRoutes from './admin.js';
+import authRoutes from './authRoutes.js';
 import { getBuildingById } from '../data/buildings.js';
 
 import { getReviewsByBuildingId } from '../data/reviews.js';
@@ -13,6 +14,7 @@ const router = Router();
 //route for admin added for preliminary structure, change and add rest as needed
 const constructorMethod = (app: Express) => {
   app.use('/admin', adminRoutes);
+  app.use('/', authRoutes);
 
   // mount router (needed for building route to work)
   app.use('/', router);

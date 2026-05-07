@@ -1,0 +1,287 @@
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #fff8ec;
+  color: #141204;
+  font-family: Monaco, "Courier New", monospace;
+  margin: 0;
+}
+
+.navbar {
+  background-color: #a9714b;
+  border-bottom: 4px solid #54442b;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-logo-link {
+  color: #fff8ec;
+  text-decoration: none;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-logo {
+  width: 70px;
+  height: auto;
+  display: block;
+}
+
+.nav-links {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.nav-links a {
+  color: #fff8ec;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.nav-links a:hover,
+.nav-logo-link:hover {
+  text-decoration: underline;
+}
+
+.site-container {
+  background-color: white;
+  max-width: 1000px;
+  min-height: 500px;
+  margin: 25px auto;
+  padding: 30px;
+  border: 2px solid #e8985e;
+  border-radius: 12px;
+}
+
+.home-page {
+  text-align: center;
+}
+
+.home-logo {
+  width: 360px;
+  max-width: 90%;
+  height: auto;
+  display: block;
+  margin: 0 auto 10px auto;
+}
+
+h1 {
+  color: #262a10;
+  margin-top: 0;
+}
+
+h2 {
+  color: #a9714b;
+}
+
+p {
+  line-height: 1.5;
+}
+
+a {
+  color: #54442b;
+}
+
+.home-search-form {
+  margin: 24px auto;
+  max-width: 650px;
+  display: flex;
+  gap: 10px;
+}
+
+input,
+button,
+select,
+textarea {
+  font-family: Monaco, "Courier New", monospace;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+textarea,
+select {
+  border: 2px solid #54442b;
+  border-radius: 8px;
+  padding: 12px;
+  width: 100%;
+  font-size: 14px;
+}
+
+button,
+input[type="submit"],
+.search-button {
+  background-color: #262a10;
+  color: #fff8ec;
+  border: 2px solid #262a10;
+  border-radius: 8px;
+  padding: 12px 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover,
+input[type="submit"]:hover,
+.search-button:hover {
+  background-color: #e8985e;
+  color: #141204;
+}
+
+form {
+  margin-top: 20px;
+}
+
+form div,
+form label {
+  display: block;
+  margin-bottom: 12px;
+}
+
+ul {
+  line-height: 1.7;
+}
+
+.error,
+p[style*="red"] {
+  color: darkred;
+  font-weight: bold;
+}
+
+.message,
+.success {
+  color: #262a10;
+  font-weight: bold;
+}
+
+#siteFooter {
+  margin-top: 30px;
+  color: #54442b;
+}
+
+.visually-hidden {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+@media (max-width: 700px) {
+  .navbar,
+  .home-search-form {
+    display: block;
+  }
+
+  .nav-links {
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .home-search-form input[type="submit"] {
+    margin-top: 10px;
+    width: 100%;
+  }
+}
+
+/* Dark mode button */
+
+.dark-toggle {
+  background-color: #fff8ec;
+  color: #262a10;
+  border: 2px solid #54442b;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-family: Monaco, "Courier New", monospace;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.dark-toggle:hover {
+  background-color: #e8985e;
+  color: #141204;
+}
+
+/* Dark mode site colors */
+
+body.dark-mode {
+  background-color: #262a10;
+  color: #fff8ec;
+}
+
+body.dark-mode .navbar {
+  background-color: #54442b;
+  border-bottom: 4px solid #e8985e;
+}
+
+body.dark-mode .site-container {
+  background-color: #141204;
+  border: 2px solid #a9714b;
+}
+
+body.dark-mode h1 {
+  color: #fff8ec;
+}
+
+body.dark-mode h2 {
+  color: #e8985e;
+}
+
+body.dark-mode p,
+body.dark-mode label,
+body.dark-mode li {
+  color: #fff8ec;
+}
+
+body.dark-mode a {
+  color: #e8985e;
+}
+
+body.dark-mode .nav-links a,
+body.dark-mode .nav-logo-link {
+  color: #fff8ec;
+}
+
+body.dark-mode input[type="text"],
+body.dark-mode input[type="email"],
+body.dark-mode input[type="password"],
+body.dark-mode input[type="number"],
+body.dark-mode textarea,
+body.dark-mode select {
+  background-color: #fff8ec;
+  color: #141204;
+  border: 2px solid #e8985e;
+}
+
+body.dark-mode button,
+body.dark-mode input[type="submit"],
+body.dark-mode .search-button {
+  background-color: #e8985e;
+  color: #141204;
+  border: 2px solid #e8985e;
+}
+
+body.dark-mode button:hover,
+body.dark-mode input[type="submit"]:hover,
+body.dark-mode .search-button:hover {
+  background-color: #a9714b;
+  color: #fff8ec;
+}
+
+body.dark-mode .dark-toggle {
+  background-color: #e8985e;
+  color: #141204;
+  border: 2px solid #fff8ec;
+}
+
+body.dark-mode #siteFooter {
+  color: #e8985e;
+}

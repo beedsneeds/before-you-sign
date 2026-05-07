@@ -1,5 +1,5 @@
 // mongoose switch import
-import { BuildingModel, type Building } from './models/Building.js';
+import { BuildingInputSchema, BuildingModel, type Building } from './models/Building.js';
 
 const checkBuildingID = (buildingID: string | number): number => {
   if (buildingID === undefined || buildingID === null || buildingID === '') {
@@ -84,6 +84,41 @@ const checkReviewsCount = (reviewsCount: string | number): number => {
   if (count < 0) throw 'Reviews count cannot be negative';
 
   return count;
+};
+
+export const createBuilding = async (
+  address: string,
+  binNumber: string | number,
+): Promise<Building> => {
+  const parsed = BuildingInputSchema.safeParse({
+    address: address,
+    BIN: Number(binNumber),
+  });
+
+  if (!parsed.success) {
+    throw parsed.error.issues.map((issue) => issue.message).join(', ');
+  }
+
+  if (parsed.data.address.length === 0) {
+    throw 'Address cannot be empty';
+  }
+
+  const existingBuilding = await BuildingModel.findOne({
+    BIN: parsed.data.BIN,
+  });
+
+  if (existingBuilding) {
+    throw 'A building with that BIN already exists';
+  }
+
+  const newBuilding = await BuildingModel.create({
+    address: parsed.data.address,
+    BIN: parsed.data.BIN,
+    avgRating: 0,
+    reviewsCount: 0,
+  });
+
+  return newBuilding.toObject();
 };
 
 export const getBuildingById = async (buildingID: string | number): Promise<Building> => {
