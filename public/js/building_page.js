@@ -1,3 +1,4 @@
+//////////Building tab
 const overviewTab = document.getElementById('overview-tab');
 const reviewsTab = document.getElementById('reviews-tab');
 const violationsTab = document.getElementById('violations-tab');
@@ -40,4 +41,33 @@ if (window.location.search.includes('sortBy=')) {
   violationsSection.style.display = 'block';
 } else {
   overviewSection.style.display = 'flex';
+}
+
+//////Forum
+const topicButtons = document.querySelectorAll('.topic-toggle');
+
+for (let i = 0; i < topicButtons.length; i++) {
+
+  topicButtons[i].addEventListener('click', function () {
+
+    const topicContent = topicButtons[i].nextElementSibling;
+
+    if (topicContent.style.display === 'block') {
+      topicContent.style.display = 'none';
+    }
+
+    else {
+      topicContent.style.display = 'block';
+    }
+
+  });
+
+}
+
+if (window.location.search.includes('commentSubmitted=true')) {
+
+  hideAllSections();
+
+  commentsSection.style.display = 'block';
+
 }

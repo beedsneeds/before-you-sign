@@ -290,6 +290,7 @@ body.dark-mode #siteFooter {
 /* building page */
 
 
+
 .building-tabs {
   width: 100%;
   max-width: 500px;
@@ -395,4 +396,33 @@ td:last-child {
 
 .vio-count {
   font-size: 28px;
+}
+
+/* Forum style*/
+
+.topic-content {
+  display: none;
+}
+
+.topic-content textarea {
+  height: 60px;
+  margin-top: 0.5rem;
+}
+
+
+.forum-topic {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+
+.topic-toggle {
+  margin-bottom: 10px;
+}
+
+#reviews form button,
+#comments form button {
+  margin-top: 10px;
 }
