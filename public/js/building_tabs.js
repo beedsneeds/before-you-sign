@@ -35,4 +35,9 @@ commentsTab.addEventListener('click', () => {
   commentsSection.style.display = 'block';
 });
 
-overviewSection.style.display = 'flex';
+if (window.location.search.includes('sortBy=')) {
+  hideAllSections();
+  violationsSection.style.display = 'block';
+} else {
+  overviewSection.style.display = 'flex';
+}

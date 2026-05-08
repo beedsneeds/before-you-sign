@@ -291,15 +291,16 @@ body.dark-mode #siteFooter {
 
 
 .building-tabs {
-  width: 500px;
+  width: 100%;
+  max-width: 500px;
   margin-bottom: 25px;
   display: flex;
   justify-content: center;
   gap: 8px;
   margin-left: auto;
   margin-right: auto;
+  flex-wrap: wrap;
 }
-
 .building-tabs button {
   background-color: #fff8ec;
   color: #54442b;
@@ -326,10 +327,10 @@ body.dark-mode #siteFooter {
   border: 2px solid #a9714b;
   border-radius: 10px;
   padding: 20px;
-  width: 500px;
+  width: 100%;
+  max-width: 500px;
   margin-top: 20px;
 }
-
 
 .overview-card h1 {
   border-bottom: 2px solid #a9714b;
@@ -338,3 +339,60 @@ body.dark-mode #siteFooter {
 }
 
 
+
+
+.violation-stats {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+.violation-stats p {
+  background-color: #fff8ec;
+  border: 2px solid #a9714b;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 25px;
+}
+
+th {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 2px solid #a9714b;
+}
+
+td {
+  padding: 12px;
+  vertical-align: top;
+  border-bottom: 1px solid #d6c7b4;
+}
+
+th a {
+  color: #54442b;
+  text-decoration: underline;
+}
+
+th a:hover {
+  color: #a9714b;
+}
+
+td:last-child {
+  max-width: 500px;
+  line-height: 1.5;
+}
+
+.vio-card {
+  min-width: 170px;
+  text-align: center;
+}
+
+.vio-count {
+  font-size: 28px;
+}

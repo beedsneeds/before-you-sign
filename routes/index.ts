@@ -46,34 +46,52 @@ router.get('/building/:id', async (req, res) => {
       A: violations.filter((v) => v.class === 'A').length,
       I: violations.filter((v) => v.class === 'I').length,
     };
-    //sample of violations description, order or most severe to least
-    const sortedViolations = [];
 
-    for (const violation of violations) {
-      if (violation.class === 'C') {
-        sortedViolations.push(violation);
+    // sort violation data based on selected column
+    const sortBy = String(req.query['sortBy'] || 'class');
+
+    const vioSorted = violations;
+
+    vioSorted.sort((a, b) => {
+      if (sortBy === 'status') {
+        if (a.violationStatus === 'Open' && b.violationStatus !== 'Open') {
+          return -1;
+        }
+
+        if (a.violationStatus !== 'Open' && b.violationStatus === 'Open') {
+          return 1;
+        }
+
+        return 0;
       }
-    }
 
-    for (const violation of violations) {
-      if (violation.class === 'B') {
-        sortedViolations.push(violation);
+      if (sortBy === 'inspectionDate') {
+        return (
+          new Date(a.inspectionDate || 0).getTime() - new Date(b.inspectionDate || 0).getTime()
+        );
       }
-    }
 
-    for (const violation of violations) {
-      if (violation.class === 'A') {
-        sortedViolations.push(violation);
+      if (sortBy === 'statusDate') {
+        return (
+          new Date(a.currentStatusDate || 0).getTime() -
+          new Date(b.currentStatusDate || 0).getTime()
+        );
       }
-    }
 
-    for (const violation of violations) {
-      if (violation.class === 'I') {
-        sortedViolations.push(violation);
-      }
-    }
 
-    const sample_violations = sortedViolations.slice(0, 5);
+      // severity order for violation classes
+      const order = {
+        C: 1,
+        B: 2,
+        A: 3,
+        I: 4,
+      };
+
+      const aClassOrder = order[a.class];
+      const bClassOrder = order[b.class];
+
+      return aClassOrder - bClassOrder;
+    });
 
     //Form submissions confirmations
     const review_confirm_submit = req.query['reviewSubmitted'];
@@ -84,9 +102,9 @@ router.get('/building/:id', async (req, res) => {
       reviews,
       violations,
       comments,
-      violations_count:violations.length,
+      violations_count: violations.length,
       vioClassCounts,
-      sample_violations,
+      vioSorted,
       review_confirm_submit,
       comment_confirm_submit,
     });
@@ -113,11 +131,7 @@ router.post('/building/:id/review', async (req, res) => {
     const building = await getBuildingById(id);
     const buildingId = (building as any)._id;
 
-    await addReview(
-      buildingId,
-      req.body.reviewText,
-      Number(req.body.rating),
-    );
+    await addReview(buildingId, req.body.reviewText, Number(req.body.rating));
 
     res.redirect(`/building/${id}?reviewSubmitted=true`);
   } catch (e) {
