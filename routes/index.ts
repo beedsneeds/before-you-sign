@@ -84,6 +84,7 @@ router.get('/building/:id', async (req, res) => {
       reviews,
       violations,
       comments,
+      violations_count:violations.length,
       vioClassCounts,
       sample_violations,
       review_confirm_submit,

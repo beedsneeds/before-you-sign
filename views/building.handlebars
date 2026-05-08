@@ -1,79 +1,99 @@
-<h1>{{building.address}}</h1>
-<p>ID: {{building.BIN}}</p>
+  {{#if review_confirm_submit}}
+    <p class ="success">Review submitted!</p>
+  {{/if}}
 
-<p>Avg Rating: {{building.avgRating}}</p>
-<p>Reviews Count: {{building.reviewsCount}}</p>
+  {{#if comment_confirm_submit}}
+    <p class ="success">Comment submitted!</p>
+  {{/if}}
 
-<h2>Reviews</h2>
-{{#each reviews}}
-  {{> reviewscard}}
-{{/each}}
-
-
-<h3>Add a review</h3>
-<form method='POST' action='/building/{{building.BIN}}/review'>
-  <label for='reviewText'>Review:</label>
-  <input
-  type='text'
-  id='reviewText'
-  name='reviewText'
-  placeholder='Please write a review'
-  required
-/>
-
-  <label for='rating'>Rating (1-5):</label>
-  <input
-  type='number'
-  id='rating'
-  name='rating'
-  min='1'
-  max='5'
-  required
-/>
-
-  <button type='submit'>Submit</button>
-</form>
-{{#if review_confirm_submit}}
-  <p>Review submitted!</p>
-{{/if}}
-
-<h2>Violations Summary</h2>
-
-<p>Class C (Most Severe): {{vioClassCounts.C}}</p>
-<p>Class B (Hazardous): {{vioClassCounts.B}}</p>
-<p>Class A (Non-Hazardous): {{vioClassCounts.A}}</p>
-<p>Class I (Information): {{vioClassCounts.I}}</p>
-
-<h3>Sample Violations</h3>
-
-<ul>
-{{#each sample_violations}}
-  <li>
-  Class {{this.class}}:
-  {{this.description}}
-  - {{this.violationStatus}}
-</li>
-{{/each}}
-</ul>
-
-<h2>Comments</h2>
-{{#each comments}}
-  <p>{{this.commentText}}</p>
-{{/each}}
+<div class="building-tabs">
+  <button id="overview-tab">Overview</button>
+  <button id="reviews-tab">Reviews</button>
+  <button id="violations-tab">Violations</button>
+  <button id="comments-tab">Comments</button>
+</div>
 
 
-<h3>Add a comment</h3>
-<form method='POST' action='/building/{{building.BIN}}/comment'>
-  <label for="commentText">Comment:</label>
-<input
-  type='text'
-  id='commentText'
-  name='commentText'
-  placeholder='Please write a comment'
-  required
-/>
-  <button type='submit'>Submit</button>
-</form>
-{{#if comment_confirm_submit}}
-  <p>Comment submitted!</p>
-{{/if}}
+
+<section id="overview" class="building-section">
+  <div class="overview-card">
+  <h1>{{building.address}}</h1>
+  <p>BIN: {{building.BIN}}</p>
+
+  <p>Avg Rating: {{building.avgRating}}</p>
+  <p>Reviews Count: {{building.reviewsCount}}</p>
+  <p>Violations Count: {{violations_count}}</p>
+</div>
+</section>
+
+<section id="reviews" class="building-section">
+  <h2>Reviews</h2>
+
+  {{#each reviews}}
+    {{> reviewscard}}
+  {{/each}}
+
+  <h3>Add a review</h3>
+
+  <form method='POST' action='/building/{{building.BIN}}/review'>
+    <label for='reviewText'>Review:</label>
+
+    <input
+      type='text'
+      id='reviewText'
+      name='reviewText'
+      placeholder='Please write a review'
+      required
+    />
+
+    <label for='rating'>Rating (1-5):</label>
+
+    <input
+      type='number'
+      id='rating'
+      name='rating'
+      min='1'
+      max='5'
+      required
+    />
+
+    <button type='submit'>Submit</button>
+  </form>
+
+</section>
+
+<section id="violations" class="building-section">
+  <h2>Violations Summary</h2>
+
+  <p>Class C (Most Severe): {{vioClassCounts.C}}</p>
+  <p>Class B (Hazardous): {{vioClassCounts.B}}</p>
+  <p>Class A (Non-Hazardous): {{vioClassCounts.A}}</p>
+  <p>Class I (Information): {{vioClassCounts.I}}</p>
+
+</section>
+
+<section id="comments" class="building-section">
+  <h2>Comments</h2>
+
+  {{#each comments}}
+    <p>{{this.commentText}}</p>
+  {{/each}}
+
+  <h3>Add a comment</h3>
+
+  <form method='POST' action='/building/{{building.BIN}}/comment'>
+    <label for="commentText">Comment:</label>
+
+    <input
+      type='text'
+      id='commentText'
+      name='commentText'
+      placeholder='Please write a comment'
+      required
+    />
+
+    <button type='submit'>Submit</button>
+  </form>
+
+
+</section>
