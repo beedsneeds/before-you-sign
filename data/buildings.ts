@@ -182,3 +182,27 @@ export const deleteBuildingById = async (buildingID: string | number): Promise<b
 
   return true;
 };
+
+export const searchBuildings = async (searchTerm: string): Promise<Building[]> => {
+  if (!searchTerm || typeof searchTerm !== 'string') {
+    throw 'Search term must be supplied';
+  }
+
+  const term = searchTerm.trim().toLowerCase();
+
+  if (term.length === 0) {
+    throw 'Search term cannot be empty';
+  }
+
+  const buildings = await BuildingModel.find({});
+
+  const results = buildings.filter((building) => {
+    const addressMatch = building.address.toLowerCase().includes(term);
+
+    const binMatch = building.BIN.toString().includes(term);
+
+    return addressMatch || binMatch;
+  });
+
+  return results.map((building) => building.toObject());
+};
