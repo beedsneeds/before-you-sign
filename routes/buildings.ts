@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getBuildingById } from '../data/buildings.js';
-
+import { calculateRatingByViolations } from '../data/violations.js';
 import { getReviewsByBuildingId } from '../data/reviews.js';
 import { getCommentsByBuildingId } from '../data/comments.js';
 import { addComment } from '../data/comments.js';
@@ -33,7 +33,9 @@ router.get('/building/:id', async (req, res) => {
     }
 
     const violations = await getViolationsByBuildingId(buildingId);
-
+    //ratings based on the violations and a summary of what violations the building has(Rahim)
+    // the data function is in data/violations.ts and is called calculateRatingByViolations(Rahim)
+    const violationSummary = calculateRatingByViolations(building.BIN);
     //
     const vioClassCounts = {
       C: violations.filter((v) => v.class === 'C').length,
@@ -101,6 +103,8 @@ router.get('/building/:id', async (req, res) => {
       vioSorted,
       review_confirm_submit,
       comment_confirm_submit,
+      //just added this but you still need to diplay it in handlebars, i didn't tuch that(Rahim)
+      violationSummary,
     });
   } catch (e) {
     res.status(404).render('error', { title: 'Error', error: e });
