@@ -96,6 +96,14 @@ router.get('/building/:id', async (req, res) => {
 
 //get reviews and comments info
 router.post('/building/:id/review', async (req, res) => {
+  const sessionInfo = req.session as any;
+
+  if (!sessionInfo.user) {
+    return res.status(403).render('error', {
+      title: 'Error',
+      error: 'Please log in to write a review',
+    });
+  }
   const id = req.params.id;
 
   const building = await getBuildingById(id);
@@ -108,6 +116,14 @@ router.post('/building/:id/review', async (req, res) => {
 
 //coment
 router.post('/building/:id/comment', async (req, res) => {
+  const sessionInfo = req.session as any;
+
+if (!sessionInfo.user) {
+  return res.status(403).render('error', {
+    title: 'Error',
+    error: 'Please log in to write a comment'
+  });
+}
   const id = req.params.id;
 
   const building = await getBuildingById(id);
