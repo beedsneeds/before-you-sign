@@ -9,6 +9,27 @@ export const getReviewsByBuildingId = async (buildingId: Types.ObjectId): Promis
 
 //adding review and update the building stats
 export const addReview = async (buildingId: Types.ObjectId, reviewText: string, rating: number) => {
+  if (!reviewText) {
+    throw 'Review text must be supplied';
+  }
+
+  if (typeof reviewText !== 'string') {
+    throw 'Review text must be a string';
+  }
+
+  reviewText = reviewText.trim();
+
+  if (reviewText.length === 0) {
+    throw 'Review text cannot be empty';
+  }
+
+  if (isNaN(rating)) {
+    throw 'Rating must be a number';
+  }
+
+  if (rating < 1 || rating > 5) {
+    throw 'Rating must be between 1 and 5';
+  }
   const newReview = await ReviewModel.create({
     buildingId: buildingId,
     reviewText: reviewText,

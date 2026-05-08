@@ -1,2 +1,15 @@
 <h1>Error</h1>
+
 <p>{{error}}</p>
+
+{{#if signInLink}}
+  <p>
+    <a href='{{signInLink}}'>Sign In</a>
+  </p>
+{{/if}}
+
+{{#if backLink}}
+  <p>
+    <a href='{{backLink}}'>Return to the building you were viewing</a>
+  </p>
+{{/if}}
