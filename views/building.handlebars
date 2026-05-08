@@ -13,7 +13,13 @@
 <h3>Add a review</h3>
 <form method='POST' action='/building/{{building.BIN}}/review'>
   <label for='reviewText'>Review:</label>
-  <input type='text' id='reviewText' name='reviewText' placeholder='Please write a review' />
+  <input
+  type='text'
+  id='reviewText'
+  name='reviewText'
+  placeholder='Please write a review'
+  required
+/>
 
   <label for='rating'>Rating (1-5):</label>
   <input

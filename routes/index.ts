@@ -96,42 +96,63 @@ router.get('/building/:id', async (req, res) => {
 
 //get reviews and comments info
 router.post('/building/:id/review', async (req, res) => {
-  const sessionInfo = req.session as any;
+  try {
+    const sessionInfo = req.session as any;
+    const id = req.params.id;
 
-  if (!sessionInfo.user) {
-    return res.status(403).render('error', {
+    if (!sessionInfo.user) {
+      return res.status(403).render('error', {
+        title: 'Error',
+        error: 'Please sign in to write a review',
+        signInLink: '/signin',
+        backLink: `/building/${id}`,
+      });
+    }
+
+    const building = await getBuildingById(id);
+    const buildingId = (building as any)._id;
+
+    await addReview(
+      buildingId,
+      req.body.reviewText,
+      Number(req.body.rating),
+    );
+
+    res.redirect(`/building/${id}?reviewSubmitted=true`);
+  } catch (e) {
+    return res.status(400).render('error', {
       title: 'Error',
-      error: 'Please log in to write a review',
+      error: e,
     });
   }
-  const id = req.params.id;
-
-  const building = await getBuildingById(id);
-  const buildingId = (building as any)._id;
-
-  await addReview(buildingId, req.body.reviewText, Number(req.body.rating));
-
-  res.redirect(`/building/${id}?reviewSubmitted=true`);
 });
 
-//coment
+//comment
 router.post('/building/:id/comment', async (req, res) => {
-  const sessionInfo = req.session as any;
+  try {
+    const sessionInfo = req.session as any;
+    const id = req.params.id;
 
-if (!sessionInfo.user) {
-  return res.status(403).render('error', {
-    title: 'Error',
-    error: 'Please log in to write a comment'
-  });
-}
-  const id = req.params.id;
+    if (!sessionInfo.user) {
+      return res.status(403).render('error', {
+        title: 'Error',
+        error: 'Please sign in to write a comment',
+        signInLink: '/signin',
+        backLink: `/building/${id}`,
+      });
+    }
 
-  const building = await getBuildingById(id);
-  const buildingId = (building as any)._id;
+    const building = await getBuildingById(id);
+    const buildingId = (building as any)._id;
 
-  await addComment(buildingId, req.body.commentText);
+    await addComment(buildingId, req.body.commentText);
 
-  res.redirect(`/building/${id}?commentSubmitted=true`);
+    res.redirect(`/building/${id}?commentSubmitted=true`);
+  } catch (e) {
+    return res.status(400).render('error', {
+      title: 'Error',
+      error: e,
+    });
+  }
 });
-
 export default constructorMethod;

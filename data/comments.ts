@@ -7,6 +7,15 @@ export const getCommentsByBuildingId = async (buildingId: Types.ObjectId): Promi
 };
 
 export const addComment = async (buildingId: Types.ObjectId, commentText: string) => {
+  if (!commentText || typeof commentText !== 'string') {
+    throw 'Comment text must be supplied';
+  }
+
+  commentText = commentText.trim();
+
+  if (commentText.length === 0) {
+    throw 'Comment text cannot be empty';
+  }
   const newComment = await CommentModel.create({
     buildingId: buildingId,
     commentText: commentText,
