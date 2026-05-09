@@ -429,3 +429,35 @@ td:last-child {
 #comments form button {
   margin-top: 10px;
 }
+
+/* building page dark mode */
+
+body.dark-mode .overview-card,
+body.dark-mode .violation-stats p,
+body.dark-mode .forum-topic,
+body.dark-mode table {
+  background-color: #262a10;
+  color: #fff8ec;
+  border-color: #e8985e;
+}
+
+body.dark-mode th,
+body.dark-mode td {
+  color: #fff8ec;
+  border-bottom-color: #a9714b;
+}
+
+body.dark-mode th a {
+  color: #e8985e;
+}
+
+body.dark-mode .building-tabs button {
+  background-color: #a9714b;
+  color: #fff8ec;
+  border-color: #e8985e;
+}
+
+body.dark-mode .building-tabs button:hover {
+  background-color: #e8985e;
+  color: #141204;
+}

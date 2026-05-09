@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 import { ViolationModel } from './models/Violation.js';
+import { getBuildingById } from './buildings.js';
 
 //get violations for 1 building
 export const getViolationsByBuildingId = async (buildingId: Types.ObjectId) => {
@@ -11,7 +12,17 @@ export const getViolationsByBuildingId = async (buildingId: Types.ObjectId) => {
 };
 
 //fucntion to calcluate the rating based on violations
-export const calculateRatingByViolations = async (bin: number): Promise<{ rating: number; totalViolations: number; classACount: number; classBCount: number; classCCount: number; classICount: number; rentImpairingCount: number; }> => {
+export const calculateRatingByViolations = async (
+  bin: number,
+): Promise<{
+  rating: number;
+  totalViolations: number;
+  classACount: number;
+  classBCount: number;
+  classCCount: number;
+  classICount: number;
+  rentImpairingCount: number;
+}> => {
   const violations = await ViolationModel.find({ bin: bin }).lean();
 
   let totalPenalty = 0;
@@ -53,4 +64,36 @@ export const calculateRatingByViolations = async (bin: number): Promise<{ rating
     classICount,
     rentImpairingCount,
   };
+};
+
+// violations assoc with registrationId
+export const getBuildingsByRegistrationId = async (registrationId: number) => {
+  const violations = await ViolationModel.find({
+    registrationId: registrationId,
+  });
+
+  // multiple vios possible but just need 1 id
+  const unique_bldg = [];
+  const seen_bldgs = new Set();
+
+  for (const violation of violations) {
+    if (!seen_bldgs.has(violation.bin)) {
+      seen_bldgs.add(violation.bin);
+
+      const building = await getBuildingById(String(violation.bin));
+
+      const safetyScore = await calculateRatingByViolations(violation.bin);
+
+      unique_bldg.push({
+        address: building.address,
+        BIN: building.BIN,
+        avgRating: building.avgRating,
+        reviewsCount: building.reviewsCount,
+        safetyScore: safetyScore.rating,
+        violationsCount: safetyScore.totalViolations,
+      });
+    }
+  }
+
+  return unique_bldg;
 };

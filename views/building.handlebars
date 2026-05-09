@@ -11,6 +11,7 @@
   <button id="reviews-tab">Reviews</button>
   <button id="violations-tab">Violations</button>
   <button id="comments-tab">Forum</button>
+  <button id="associated-tab">Associated Buildings</button>
 </div>
 
 <section id="overview" class="building-section">
@@ -151,5 +152,61 @@
     <button type="submit">Create Topic</button>
   </form>
 </section>
+<section id="associated" class="building-section">
 
+  <h2>Associated Buildings</h2>
+
+  <p>
+    Registration ID: {{registrationId}}
+  </p>
+
+  <p>
+    Buildings Found: {{assoc_bldgs.length}}
+  </p>
+
+  <table>
+
+    <tr>
+      <th>Address</th>
+      <th>BIN</th>
+      <th>Avg Rating</th>
+      <th>Safety Score</th>
+      <th>Violations</th>
+    </tr>
+
+    {{#each assoc_bldgs}}
+
+      <tr>
+
+        <td>
+          <a href="/building/{{this.BIN}}">
+            {{this.address}}
+          </a>
+        </td>
+
+        <td>
+          <a href="/building/{{this.BIN}}">
+            {{this.BIN}}
+          </a>
+        </td>
+
+        <td>
+          {{this.avgRating}}
+        </td>
+
+        <td>
+          {{this.safetyScore}}
+        </td>
+
+        <td>
+          {{this.violationsCount}}
+        </td>
+
+      </tr>
+
+    {{/each}}
+
+  </table>
+
+</section>
 <script src="/public/js/building_page.js"></script>
