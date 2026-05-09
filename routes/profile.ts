@@ -1,6 +1,7 @@
 import xss from "xss";
-import { Router, type Request, type Response, type NextFunction } from 'express';
-import { getUserProfileById, updateUserProfile } from '../data/profile.js';
+import { Router, type Request, type Response, type NextFunction } from "express";
+import { getUserProfileById, updateUserProfile } from "../data/profile.js";
+import xss from "xss";
 
 const router = Router();
 
