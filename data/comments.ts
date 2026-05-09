@@ -6,19 +6,28 @@ export const getCommentsByBuildingId = async (buildingId: Types.ObjectId): Promi
   return comments.map((comment: any) => comment.toObject());
 };
 
-export const addComment = async (buildingId: Types.ObjectId, commentText: string) => {
-  if (!commentText || typeof commentText !== 'string') {
-    throw 'Comment text must be supplied';
+export const addComment = async (
+  buildingId: Types.ObjectId,
+  topicTitle: string,
+) => {
+  
+  if (!topicTitle || typeof topicTitle !== 'string') {
+    throw 'Topic title must be supplied';
   }
 
-  commentText = commentText.trim();
+  topicTitle = topicTitle.trim();
 
-  if (commentText.length === 0) {
-    throw 'Comment text cannot be empty';
+  if (topicTitle.length === 0) {
+    throw 'Topic title cannot be empty';
   }
+
+  if (topicTitle.length < 5) {
+    throw 'Topic title must be at least 5 characters';
+  }
+
   const newComment = await CommentModel.create({
     buildingId: buildingId,
-    commentText: commentText,
+    topicTitle: topicTitle,
     userId: new Types.ObjectId(),
     timeCreated: new Date(),
   });

@@ -81,3 +81,10 @@ To validate a doc read from the DB (don't usually need this, its main use is to 
 # Why do we need so many interfaces?
 
 Because input shape is not the same as what's stored in the db and some fields are transformed before storing (password to hashedPassword)
+
+
+# Forum Note
+
+The existing "Comment" model is used to represent forum topics/threads on building pages.
+
+Replies to forum topics are stored separately in the Reply model.

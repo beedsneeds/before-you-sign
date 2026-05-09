@@ -290,6 +290,7 @@ body.dark-mode #siteFooter {
 /* building page */
 
 
+
 .building-tabs {
   width: 100%;
   max-width: 500px;
@@ -395,4 +396,68 @@ td:last-child {
 
 .vio-count {
   font-size: 28px;
+}
+.small-text {
+  font-size: 0.8rem;
+}
+
+/* Forum style*/
+
+.topic-content {
+  display: none;
+}
+
+.topic-content textarea {
+  height: 60px;
+  margin-top: 0.5rem;
+}
+
+
+.forum-topic {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+
+.topic-toggle {
+  margin-bottom: 10px;
+}
+
+#reviews form button,
+#comments form button {
+  margin-top: 10px;
+}
+
+/* building page dark mode */
+
+body.dark-mode .overview-card,
+body.dark-mode .violation-stats p,
+body.dark-mode .forum-topic,
+body.dark-mode table {
+  background-color: #262a10;
+  color: #fff8ec;
+  border-color: #e8985e;
+}
+
+body.dark-mode th,
+body.dark-mode td {
+  color: #fff8ec;
+  border-bottom-color: #a9714b;
+}
+
+body.dark-mode th a {
+  color: #e8985e;
+}
+
+body.dark-mode .building-tabs button {
+  background-color: #a9714b;
+  color: #fff8ec;
+  border-color: #e8985e;
+}
+
+body.dark-mode .building-tabs button:hover {
+  background-color: #e8985e;
+  color: #141204;
 }

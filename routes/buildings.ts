@@ -5,7 +5,10 @@ import { getReviewsByBuildingId } from '../data/reviews.js';
 import { getCommentsByBuildingId } from '../data/comments.js';
 import { addComment } from '../data/comments.js';
 import { addReview } from '../data/reviews.js';
-import { getViolationsByBuildingId } from '../data/violations.js';
+import { getViolationsByBuildingId, getBuildingsByRegistrationId } from '../data/violations.js';
+import { addReply } from '../data/replies.js';
+import { Types } from 'mongoose';
+import { getRepliesByTopicId } from '../data/replies.js';
 
 const router = Router();
 
@@ -17,10 +20,31 @@ router.get('/building/:id', async (req, res) => {
     const buildingId = (building as any)._id;
     const reviews = await getReviewsByBuildingId(buildingId);
     const comments = await getCommentsByBuildingId(buildingId);
+
+    const commentsWithReplies = [];
+    let assoc_bldgs: any[] = [];
+    let registrationId = null;
+
+    for (const comment of comments) {
+      const replies = await getRepliesByTopicId((comment as any)._id);
+
+      commentsWithReplies.push({
+        comment: comment,
+        replies: replies,
+      });
+    }
+    // grab registrationid if vio exists, first regid that there is
     const violations = await getViolationsByBuildingId(buildingId);
+    if (violations.length > 0 && violations[0].registrationId) {
+      registrationId = violations[0].registrationId;
+
+      assoc_bldgs = await getBuildingsByRegistrationId(registrationId);
+    }
+    assoc_bldgs = assoc_bldgs.filter((b) => b.BIN !== building.BIN);
     //ratings based on the violations and a summary of what violations the building has(Rahim)
     // the data function is in data/violations.ts and is called calculateRatingByViolations(Rahim)
-    const violationSummary = calculateRatingByViolations(building.BIN);
+    const violationSummary = await calculateRatingByViolations(building.BIN);
+    console.log(violationSummary);
     //
     const vioClassCounts = {
       C: violations.filter((v) => v.class === 'C').length,
@@ -82,7 +106,9 @@ router.get('/building/:id', async (req, res) => {
       building,
       reviews,
       violations,
-      comments,
+      comments: commentsWithReplies,
+      assoc_bldgs,
+      registrationId,
       violations_count: violations.length,
       vioClassCounts,
       vioSorted,
@@ -143,13 +169,38 @@ router.post('/building/:id/comment', async (req, res) => {
     const building = await getBuildingById(id);
     const buildingId = (building as any)._id;
 
-    await addComment(buildingId, req.body.commentText);
+    await addComment(buildingId, req.body.topicTitle);
 
     res.redirect(`/building/${id}?commentSubmitted=true`);
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Error',
       error: e,
+    });
+  }
+});
+
+//reply
+
+router.post('/topic/:id/reply', async (req, res) => {
+  try {
+    const sessionInfo = req.session as any;
+
+    if (!sessionInfo.user) {
+      return res.status(403).render('error', {
+        title: 'Error',
+        error: 'Please sign in to reply',
+      });
+    }
+
+    await addReply(new Types.ObjectId(req.params.id), req.body.replyText);
+
+    res.redirect(`/building/${req.body.buildingBIN}?commentSubmitted=true`);
+  } catch (e) {
+    return res.status(400).render('error', {
+      title: 'Error',
+      error: e,
+      backLink: `/building/${req.body.buildingBIN}?commentSubmitted=true`,
     });
   }
 });
