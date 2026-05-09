@@ -40,6 +40,7 @@ router.get('/building/:id', async (req, res) => {
 
       assoc_bldgs = await getBuildingsByRegistrationId(registrationId);
     }
+    assoc_bldgs = assoc_bldgs.filter((b) => b.BIN !== building.BIN);
     //ratings based on the violations and a summary of what violations the building has(Rahim)
     // the data function is in data/violations.ts and is called calculateRatingByViolations(Rahim)
     const violationSummary = await calculateRatingByViolations(building.BIN);
