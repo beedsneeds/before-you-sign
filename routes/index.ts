@@ -3,6 +3,7 @@ import adminRoutes from './admin.js';
 import authRoutes from './authRoutes.js';
 import buildingRoutes from './buildings.js';
 import searchRoutes from './search.js';
+import favoritesRoutes from './favorites.js';
 const router = Router();
 
 //route for admin added for preliminary structure, change and add rest as needed
@@ -11,6 +12,7 @@ const constructorMethod = (app: Express) => {
   app.use('/admin', adminRoutes);
   app.use('/', authRoutes);
   app.use('/', buildingRoutes);
+  app.use('/', favoritesRoutes);
 
   // mount router (needed for building route to work)
   app.use('/', router);

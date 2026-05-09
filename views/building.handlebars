@@ -23,6 +23,12 @@
   <p>Avg Rating: {{building.avgRating}}</p>
   <p>Reviews Count: {{building.reviewsCount}}</p>
   <p>Violations Count: {{violations_count}}</p>
+
+      <form action="/favorites/{{building._id}}" method="POST">
+      <button type="submit">
+        Save to Favorites
+      </button>
+      </form>
 </div>
 </section>
 

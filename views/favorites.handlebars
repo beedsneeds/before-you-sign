@@ -1,0 +1,33 @@
+<h1>My Favorite Buildings</h1>
+
+{{#if buildings.length}}
+
+  {{#each buildings}}
+    <div class='favorite-card'>
+
+      <h2>{{this.address}}</h2>
+
+      <p><strong>BIN:</strong> {{this.BIN}}</p>
+
+      <p><strong>Rating:</strong> {{this.avgRating}}</p>
+
+      <a href='/building/{{this.BIN}}' class='view-btn'>
+        View Building
+      </a>
+
+      <form action='/favorites/{{this._id}}/remove' method='POST'>
+        <button type='submit'>
+          Remove from Favorites
+        </button>
+      </form>
+
+    </div>
+  {{/each}}
+
+{{else}}
+
+  <p>You have no favorite buildings yet.</p>
+
+{{/if}}
+
+<a href='/'>Back to Search</a>
