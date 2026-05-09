@@ -5,7 +5,11 @@ import { tick, startCron } from "../cron/cron.js";
 import { UserModel } from "../models/User.js";
 import { BuildingModel } from "../models/Building.js";
 import { ReviewModel } from "../models/Review.js";
+
+//REMEMBER, comments are now called topics in "Forum" in buildings
 import { CommentModel } from "../models/Comment.js";
+import { ReplyModel } from "../models/Reply.js";
+
 import { existsSync, promises as fsPromises } from "node:fs";
 import { join } from "node:path";
 import readline from "node:readline/promises";
@@ -57,16 +61,24 @@ const main = async () => {
 
   const adminId = new Types.ObjectId();
   const userId = new Types.ObjectId();
+  const zm_userId = new Types.ObjectId();
 
   const building1Id = new Types.ObjectId();
   const building2Id = new Types.ObjectId();
   const building3Id = new Types.ObjectId();
+  const assocBuildId = new Types.ObjectId();
 
   const review1Id = new Types.ObjectId();
   const review2Id = new Types.ObjectId();
+  const review3Id = new Types.ObjectId();
 
-  const comment1Id = new Types.ObjectId();
-  const comment2Id = new Types.ObjectId();
+  // "Comment" model is now "Topics" (in name only)
+  const topic1Id = new Types.ObjectId();
+  const topic2Id = new Types.ObjectId();
+  const topic3Id = new Types.ObjectId();
+
+  const reply1Id = new Types.ObjectId();
+  const reply2Id = new Types.ObjectId();
 
   await UserModel.insertMany([
     {
@@ -79,7 +91,7 @@ const main = async () => {
       activityScore: 10,
       savedBuildings: [building1Id, building2Id], //joined notifications with saved buildings for simplicity
       reviewIds: [review1Id],
-      commentIds: [comment2Id],
+      commentIds: [topic2Id],
     },
     {
       _id: userId,
@@ -92,7 +104,21 @@ const main = async () => {
       notifications: [{ building2Id: true }], //separate field for notifications
       savedBuildings: [building2Id],
       reviewIds: [review2Id],
-      commentIds: [comment1Id],
+      commentIds: [topic1Id],
+    },
+
+    {
+      _id: zm_userId,
+      firstName: "Zohran",
+      lastName: "Mamdani",
+      email: "zohran@nyc.com",
+      hashedPassword: await hashPassword("zmpassword"),
+      isAdmin: false,
+
+      savedBuildings: [],
+
+      reviewIds: [review3Id],
+      commentIds: [topic3Id],
     },
   ]);
 
@@ -101,22 +127,30 @@ const main = async () => {
       _id: building1Id,
       address: "179-49 Zoller Road, Queens, NY 11434",
       BIN: 4269660,
-      avgRating: 4,
-      reviewsCount: 1,
+      //avgRating: 4,
+      //reviewsCount: 1,
     },
     {
       _id: building2Id,
       address: "178-26 Zoller Road, Queens, NY 11434",
       BIN: 4270016,
-      avgRating: 3,
-      reviewsCount: 1,
+      //avgRating: 3,
+      //reviewsCount: 1,
     },
     {
       _id: building3Id,
       address: "178-31 Zoller Road, Queens, NY 11434",
       BIN: 4269997,
-      avgRating: 0,
-      reviewsCount: 0,
+      //avgRating: 0,
+      //reviewsCount: 0,
+    },
+
+    // BUILDING WITH LOTS OF ASSOCIATED BUILDINGS
+    // Associated Buildings tab population REQUIRES step 1 in data/cron/README.md (violations.csv)
+    {
+      _id: assocBuildId,
+      address: "300 Cherry Street, Manhattan, NY 10002",
+      BIN: 1077517,
     },
   ]);
 
@@ -137,26 +171,61 @@ const main = async () => {
       reviewText: "Decent place but recurring issues.",
       timeCreated: new Date(),
     },
+    {
+      _id: review3Id,
+      userId: zm_userId,
+      buildingId: building2Id,
+      rating: 3,
+      reviewText: "The location is amazing, but it's very crowded.",
+      timeCreated: new Date(),
+    },
   ]);
 
   await CommentModel.insertMany([
     {
-      _id: comment1Id,
+      _id: topic1Id,
       userId: userId,
       buildingId: building1Id,
-      reviewId: review1Id,
-      topicTitle: "Totally agree with this.",
+      //reviewId: review1Id,
+      topicTitle: "Did anyone else have no hot water for a week?",
       timeCreated: new Date(),
     },
     {
-      _id: comment2Id,
+      _id: topic2Id,
       userId: adminId,
       buildingId: building2Id,
-      reviewId: review2Id,
-      topicTitle: "Heard similar complaints.",
+      //reviewId: review2Id,
+      topicTitle: "How much was your rent increase?",
+      timeCreated: new Date(),
+    },
+    {
+      _id: topic3Id,
+      userId: zm_userId,
+      buildingId: building2Id,
+      //reviewId: review2Id,
+      topicTitle: "Did anyone else have heating issues?",
       timeCreated: new Date(),
     },
   ]);
+
+  await ReplyModel.insertMany([
+    {
+      _id: reply1Id,
+      topicId: topic1Id,
+      userId: adminId,
+      replyText: "Yes, ours was out for 5 days, had to call 311 until landlord responded.",
+      timeCreated: new Date(),
+    },
+    {
+      _id: reply2Id,
+      topicId: topic2Id,
+      userId: zm_userId,
+      replyText: "Yes, they increased it almost 6%...",
+      timeCreated: new Date(),
+    },
+  ]);
+
+  console.log("To test associated buildings, search BIN 1077517 (requires step 1 in data/cron/README.md)");
 
   if (!needsCron) {
     console.log(
