@@ -15,13 +15,13 @@ router.get('/search', async (req, res) => {
 
     const results = await searchBuildings(search);
 
-    return res.render('searchResults', {
+    return res.render('searchresults', {
       title: 'Search Results',
       query: search,
       results,
     });
   } catch (e) {
-    return res.status(400).render('searchResults', {
+    return res.status(400).render('searchresults', {
       title: 'Search Results',
       error: e,
       results: [],

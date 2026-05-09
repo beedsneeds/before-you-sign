@@ -1,6 +1,6 @@
-import { UserModel, type User } from './models/User.js';
+import { UserModel, UserInputSchema } from './models/User.js';
 import bcrypt from 'bcrypt';
-import { checkString } from '../helpers/validation.js';
+import { formatZodError } from '../helpers/validation.js';
 
 export const createUser = async ({
   firstName,
@@ -15,39 +15,26 @@ export const createUser = async ({
   password: string;
   isAdmin?: boolean;
 }) => {
-  if (!firstName || !lastName || !email || !password) {
-    throw 'Error: All fields must be provided.';
-  }
+  const parsed = UserInputSchema.safeParse({ firstName, lastName, email, password });
+  if (!parsed.success) throw formatZodError(parsed.error);
 
-  const checkedFirstName = checkString(firstName, 2, 50, /[^a-zA-Z ]/);
-  const checkedLastName = checkString(lastName, 2, 50, /[^a-zA-Z ]/);
-  const checkedEmail = checkString(email, 5, 255, /[^\w@.\-]/i).toLowerCase();
-  const checkedPassword = checkString(password, 8, undefined, /\s/);
+  const checkedEmail = parsed.data.email.toLowerCase();
 
-  if (
-    !/[A-Z]/.test(checkedPassword) ||
-    !/[0-9]/.test(checkedPassword) ||
-    !/[^a-zA-Z0-9]/.test(checkedPassword)
-  ) {
-    throw 'Error: Password must contain at least one uppercase letter, one number, and one special character.';
-  }
-
-  const existing = await UserModel.findOne({
-    email: new RegExp(`^${checkedEmail}$`, 'i'),
-  });
+  const existing = await UserModel.findOne({ email: checkedEmail });
 
   if (existing) throw 'Error: An account with that email already exists.';
 
-  const hashedPassword = await bcrypt.hash(checkedPassword, 12);
+  const hashedPassword = await bcrypt.hash(parsed.data.password, 12);
 
   const newUser = new UserModel({
-    firstName: checkedFirstName,
-    lastName: checkedLastName,
+    firstName: parsed.data.firstName,
+    lastName: parsed.data.lastName,
     email: checkedEmail,
     hashedPassword,
     isAdmin: false,
     activityScore: 0,
     savedBuildings: [],
+    notificationPrefs: ['inApp'],
     reviewIds: [],
     commentIds: [],
   });
@@ -68,16 +55,13 @@ export const checkUser = async (email: string, password: string) => {
     throw 'Error: Both email and password must be provided.';
   }
 
-  const checkedEmail = checkString(email, 5, 255, /[^\w@.\-]/i).toLowerCase();
-  const checkedPassword = checkString(password, 8, undefined, /\s/);
+  const checkedEmail = email.trim().toLowerCase();
 
-  const user = await UserModel.findOne({
-    email: new RegExp(`^${checkedEmail}$`, 'i'),
-  });
+  const user = await UserModel.findOne({ email: checkedEmail });
 
   if (!user) throw 'Error: Either the email or password is invalid.';
 
-  const passwordMatch = await bcrypt.compare(checkedPassword, user.hashedPassword);
+  const passwordMatch = await bcrypt.compare(password, user.hashedPassword);
   if (!passwordMatch) throw 'Error: Either the email or password is invalid.';
 
   await UserModel.findByIdAndUpdate(user._id, {

@@ -1,9 +1,15 @@
 import bcrypt from 'bcrypt';
 import { Types } from 'mongoose';
-import { UserModel, type User } from './models/User.js';
+import { UserModel, UserInputSchema, type User } from './models/User.js';
 import { ReviewModel, type Review } from './models/Review.js';
 import { CommentModel, type Comment } from './models/Comment.js';
-import { checkString } from '../helpers/validation.js';
+import { formatZodError } from '../helpers/validation.js';
+
+const ProfileUpdateSchema = UserInputSchema.pick({
+  firstName: true,
+  lastName: true,
+  email: true,
+});
 
 const checkObjectId = (id: string): Types.ObjectId => {
   if (!id || typeof id !== 'string') {
@@ -58,16 +64,13 @@ export const updateUserProfile = async (
 ) => {
   const id = checkObjectId(userId);
 
-  if (!firstName || !lastName || !email) {
-    throw 'Error: First name, last name, and email are required.';
-  }
+  const parsed = ProfileUpdateSchema.safeParse({ firstName, lastName, email });
+  if (!parsed.success) throw formatZodError(parsed.error);
 
-  const checkedFirstName = checkString(firstName, 2, 50, /[^a-zA-Z ]/);
-  const checkedLastName = checkString(lastName, 2, 50, /[^a-zA-Z ]/);
-  const checkedEmail = checkString(email, 5, 255, /[^\w@.\-]/i).toLowerCase();
+  const checkedEmail = parsed.data.email.toLowerCase();
 
   const existingUser = await UserModel.findOne({
-    email: new RegExp(`^${checkedEmail}$`, 'i'),
+    email: checkedEmail,
     _id: { $ne: id },
   });
 
@@ -76,23 +79,16 @@ export const updateUserProfile = async (
   }
 
   const updateDoc: Partial<User> = {
-    firstName: checkedFirstName,
-    lastName: checkedLastName,
+    firstName: parsed.data.firstName,
+    lastName: parsed.data.lastName,
     email: checkedEmail,
   } as Partial<User>;
 
   if (password && password.trim().length > 0) {
-    const checkedPassword = checkString(password, 8, undefined, /\s/);
+    const parsedPassword = UserInputSchema.shape.password.safeParse(password);
+    if (!parsedPassword.success) throw formatZodError(parsedPassword.error);
 
-    if (
-      !/[A-Z]/.test(checkedPassword) ||
-      !/[0-9]/.test(checkedPassword) ||
-      !/[^a-zA-Z0-9]/.test(checkedPassword)
-    ) {
-      throw 'Error: Password must contain at least one uppercase letter, one number, and one special character.';
-    }
-
-    updateDoc.hashedPassword = await bcrypt.hash(checkedPassword, 12);
+    updateDoc.hashedPassword = await bcrypt.hash(parsedPassword.data, 12);
   }
 
   const updatedUser = await UserModel.findByIdAndUpdate(id, updateDoc, {
@@ -103,5 +99,5 @@ export const updateUserProfile = async (
     throw 'Error: Could not update user profile.';
   }
 
-  return updatedUser.toObject() as User;
+  return updatedUser.toObject() as User & { _id: Types.ObjectId };
 };
