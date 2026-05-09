@@ -1,7 +1,7 @@
 How to run the cron job:
 
 #1
-(Optional) download, unzip and rename any [release](https://github.com/beedsneeds/before-you-sign/releases) on our github to violations.csv. Place it in data/cron
+download, unzip and rename any [release](https://github.com/beedsneeds/before-you-sign/releases) on our github to violations.csv. Place it in data/cron
 
 #2
 Run `npx tsx data/cron/cron.ts`
