@@ -1,0 +1,21 @@
+<h1>My Favorite Buildings</h1>
+
+{{#if buildings.length}}
+  <ul>
+    {{#each buildings}}
+      <li>
+        <a href='/building/{{this.BIN}}'>
+          {{this.address}}
+        </a>
+
+        <form action='/favorites/{{this._id}}/remove' method='POST'>
+          <button type='submit'>Remove</button>
+        </form>
+      </li>
+    {{/each}}
+  </ul>
+{{else}}
+  <p>You do not have any favorited buildings at the moment.</p>
+{{/if}}
+
+<a href='/' class='back-link'>Back to Search</a>

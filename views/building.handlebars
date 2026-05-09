@@ -18,16 +18,22 @@
   <div class="overview-card">
     <h1>{{building.address}}</h1>
     <p>BIN: {{building.BIN}}</p>
-    <p>Avg Rating: {{building.avgRating}}
-      ({{building.reviewsCount}} review/s)
-    </p>
+    <p>Avg Rating: {{building.avgRating}} ({{building.reviewsCount}} review/s)</p>
     <p>Violations Count: {{violations_count}}</p>
     <p>Building Safety Score: {{violationSummary.rating}} / 5</p>
     <p>Total Violations: {{violationSummary.totalViolations}}</p>
 
-
     <p class="small-text">
-      *Based on building violations and severity levels. Higher scores indicate better safety.</p>
+      *Based on building violations and severity levels. Higher scores indicate better safety.
+    </p>
+
+    {{#if favorite_exists}}
+      <p class="error">This building has already been favorited by you.</p>
+    {{/if}}
+
+    <form action="/favorites/{{building._id}}" method="POST">
+      <button type="submit">Save to Favorites</button>
+    </form>
   </div>
 </section>
 
@@ -35,7 +41,7 @@
   <h2>Reviews</h2>
 
   {{#each reviews}}
-  {{> reviewscard}}
+    {{> reviewscard}}
   {{/each}}
 
   <h3>Add a review</h3>
@@ -43,8 +49,10 @@
   <form method="POST" action="/building/{{building.BIN}}/review">
     <label for="reviewText">Review:</label>
     <input type="text" id="reviewText" name="reviewText" placeholder="Please write a review" required />
+
     <label for="rating">Rating (1-5):</label>
     <input type="number" id="rating" name="rating" min="1" max="5" required />
+
     <button type="submit">Submit</button>
   </form>
 </section>
@@ -58,16 +66,19 @@
       <span>Most Severe</span>
       <p class="vio-count">{{vioClassCounts.C}}</p>
     </div>
+
     <div class="vio-card">
       <h3>Class B</h3>
       <span>Hazardous</span>
       <p class="vio-count">{{vioClassCounts.B}}</p>
     </div>
+
     <div class="vio-card">
       <h3>Class A</h3>
       <span>Non-Hazardous</span>
       <p class="vio-count">{{vioClassCounts.A}}</p>
     </div>
+
     <div class="vio-card">
       <h3>Class I</h3>
       <span>Information</span>
@@ -76,26 +87,27 @@
   </div>
 
   {{#if vioSorted.length}}
-  <table>
-    <tr>
-      <th><a href="/building/{{building.BIN}}?sortBy=class">Class</a></th>
-      <th><a href="/building/{{building.BIN}}?sortBy=status">Status</a></th>
-      <th><a href="/building/{{building.BIN}}?sortBy=inspectionDate">Inspection Date</a></th>
-      <th><a href="/building/{{building.BIN}}?sortBy=statusDate">Status Updated</a></th>
-      <th>Description</th>
-    </tr>
-    {{#each vioSorted}}
-    <tr>
-      <td>{{this.class}}</td>
-      <td>{{this.violationStatus}}</td>
-      <td>{{this.inspectionDate}}</td>
-      <td>{{this.currentStatusDate}}</td>
-      <td>{{this.description}}</td>
-    </tr>
-    {{/each}}
-  </table>
+    <table>
+      <tr>
+        <th><a href="/building/{{building.BIN}}?sortBy=class">Class</a></th>
+        <th><a href="/building/{{building.BIN}}?sortBy=status">Status</a></th>
+        <th><a href="/building/{{building.BIN}}?sortBy=inspectionDate">Inspection Date</a></th>
+        <th><a href="/building/{{building.BIN}}?sortBy=statusDate">Status Updated</a></th>
+        <th>Description</th>
+      </tr>
+
+      {{#each vioSorted}}
+        <tr>
+          <td>{{this.class}}</td>
+          <td>{{this.violationStatus}}</td>
+          <td>{{this.inspectionDate}}</td>
+          <td>{{this.currentStatusDate}}</td>
+          <td>{{this.description}}</td>
+        </tr>
+      {{/each}}
+    </table>
   {{else}}
-  <p>No violations found for this building.</p>
+    <p>No violations found for this building.</p>
   {{/if}}
 </section>
 
@@ -103,26 +115,29 @@
   <h2>Forum</h2>
 
   {{#each comments}}
-  <div class="forum-topic">
-    <button class="topic-toggle">
-      {{this.comment.topicTitle}}
-    </button>
-    <div class="topic-content">
-      <h4>Replies</h4>
-      {{#if this.replies.length}}
-      {{#each this.replies}}
-      <p>{{this.replyText}}</p>
-      {{/each}}
-      {{else}}
-      <p>No replies yet.</p>
-      {{/if}}
-      <form method="POST" action="/topic/{{this.comment._id}}/reply">
-        <input type="hidden" name="buildingBIN" value="{{@root.building.BIN}}" />
-        <textarea name="replyText" placeholder="Write a reply" required></textarea>
-        <button type="submit">Reply</button>
-      </form>
+    <div class="forum-topic">
+      <button class="topic-toggle">
+        {{this.comment.topicTitle}}
+      </button>
+
+      <div class="topic-content">
+        <h4>Replies</h4>
+
+        {{#if this.replies.length}}
+          {{#each this.replies}}
+            <p>{{this.replyText}}</p>
+          {{/each}}
+        {{else}}
+          <p>No replies yet.</p>
+        {{/if}}
+
+        <form method="POST" action="/topic/{{this.comment._id}}/reply">
+          <input type="hidden" name="buildingBIN" value="{{@root.building.BIN}}" />
+          <textarea name="replyText" placeholder="Write a reply" required></textarea>
+          <button type="submit">Reply</button>
+        </form>
+      </div>
     </div>
-  </div>
   {{/each}}
 
   <h3>Create A Topic</h3>
@@ -134,23 +149,13 @@
   </form>
 </section>
 
-
-
-
 <section id="associated" class="building-section">
-
   <h2>Associated Buildings</h2>
 
-  <p>
-    Registration ID: {{registrationId}}
-  </p>
-
-  <p>
-    Buildings Found: {{assoc_bldgs.length}}
-  </p>
+  <p>Registration ID: {{registrationId}}</p>
+  <p>Buildings Found: {{assoc_bldgs.length}}</p>
 
   <table>
-
     <tr>
       <th>Address</th>
       <th>BIN</th>
@@ -158,49 +163,33 @@
       <th>Safety Score</th>
       <th>Violations</th>
     </tr>
+
     {{#if assoc_bldgs.length}}
+      {{#each assoc_bldgs}}
+        <tr>
+          <td>
+            <a href="/building/{{this.BIN}}">
+              {{this.address}}
+            </a>
+          </td>
 
-    {{#each assoc_bldgs}}
+          <td>
+            <a href="/building/{{this.BIN}}">
+              {{this.BIN}}
+            </a>
+          </td>
 
-    <tr>
-
-      <td>
-        <a href="/building/{{this.BIN}}">
-          {{this.address}}
-        </a>
-      </td>
-
-      <td>
-        <a href="/building/{{this.BIN}}">
-          {{this.BIN}}
-        </a>
-      </td>
-
-      <td>
-        {{this.avgRating}}
-      </td>
-
-      <td>
-        {{this.safetyScore}}
-      </td>
-
-      <td>
-        {{this.violationsCount}}
-      </td>
-
-    </tr>
-
-    {{/each}}
+          <td>{{this.avgRating}}</td>
+          <td>{{this.safetyScore}}</td>
+          <td>{{this.violationsCount}}</td>
+        </tr>
+      {{/each}}
     {{else}}
-    <tr>
-      <td colspan="5">No associated buildings were found.</td>
-    </tr>
+      <tr>
+        <td colspan="5">No associated buildings were found.</td>
+      </tr>
     {{/if}}
-
   </table>
-
 </section>
-
-
 
 <script src="/public/js/building_page.js"></script>
