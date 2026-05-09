@@ -1,3 +1,4 @@
+import * as z from "zod";
 export const checkString = (
   str: string,
   minLength: number,
@@ -5,7 +6,7 @@ export const checkString = (
   invalidChars: RegExp,
 ) => {
   str = str.trim();
-  if (typeof str !== 'string') {
+  if (typeof str !== "string") {
     throw `Error: ${str} must be a string.`;
   }
   if (str.length === 0) {
@@ -21,9 +22,8 @@ export const checkString = (
     throw `Error: ${str} must be no more than ${maxLength} characters long.`;
   }
   if (invalidChars.test(str)) {
-    throw `Error: ${str} constains invalid characters.`;
+    throw `Error: ${str} contains invalid characters.`;
   }
-import * as z from 'zod';
 
   return str;
 };
