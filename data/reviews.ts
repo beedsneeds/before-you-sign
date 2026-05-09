@@ -23,8 +23,16 @@ export const addReview = async (buildingId: Types.ObjectId, reviewText: string, 
     throw 'Review text cannot be empty';
   }
 
+  if (reviewText.length < 10) {
+    throw 'Review text must be at least 10 characters';
+  }
+
   if (isNaN(rating)) {
     throw 'Rating must be a number';
+  }
+
+  if (!Number.isInteger(rating)) {
+    throw 'Rating must be a whole number';
   }
 
   if (rating < 1 || rating > 5) {

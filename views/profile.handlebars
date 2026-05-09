@@ -1,0 +1,66 @@
+<h1>Profile</h1>
+
+<div class='profile-grid'>
+  <section class='profile-card profile-main-card'>
+    <h2>User Information</h2>
+    <p><strong>Name:</strong> {{user.firstName}} {{user.lastName}}</p>
+    <p><strong>Email:</strong> {{user.email}}</p>
+    <p><strong>Admin status:</strong> {{#if user.isAdmin}}Yes{{else}}No{{/if}}</p>
+    <p><strong>Activity score:</strong> {{user.activityScore}}</p>
+    <p><strong>Saved buildings:</strong> {{savedBuildings.length}}</p>
+    <p><strong>Reviews:</strong> {{reviews.length}}</p>
+    <p><strong>Comments:</strong> {{comments.length}}</p>
+    <a class='button' href='/profile/edit'>Edit profile</a>
+  </section>
+
+  <section class='profile-card profile-half-card'>
+    <h2>Saved Buildings</h2>
+    {{#if savedBuildings.length}}
+      <ul>
+        {{#each savedBuildings}}
+          <li>
+            <a href='/building/{{BIN}}'>{{address}} (BIN: {{BIN}})</a>
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <p>No saved buildings yet.</p>
+    {{/if}}
+  </section>
+
+  <section class='profile-card profile-half-card'>
+    <h2>Reviews & Comments</h2>
+
+    {{#if reviews.length}}
+      <h3>Reviews</h3>
+      <ul>
+        {{#each reviews}}
+          <li>
+            <strong>{{#if buildingId}}{{buildingId.address}}{{else}}Building{{/if}}</strong>
+            {{#if buildingId}}(BIN: {{buildingId.BIN}}){{/if}}<br />
+            Rating:
+            {{rating}}<br />
+            {{reviewText}}
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <p>No reviews yet.</p>
+    {{/if}}
+
+    {{#if comments.length}}
+      <h3>Comments</h3>
+      <ul>
+        {{#each comments}}
+          <li>
+            <strong>{{#if buildingId}}{{buildingId.address}}{{else}}Building{{/if}}</strong>
+            {{#if buildingId}}(BIN: {{buildingId.BIN}}){{/if}}<br />
+            {{commentText}}
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <p>No comments yet.</p>
+    {{/if}}
+  </section>
+</div>
