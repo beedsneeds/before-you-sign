@@ -1,23 +1,25 @@
 <h1>Delete Building</h1>
 
 {{#if error}}
-  <p>{{error}}</p>
+  <p class="error">{{error}}</p>
 {{/if}}
 
 {{#if success}}
-  <p>{{success}}</p>
+  <p class="success">{{success}}</p>
 {{/if}}
 
 <h2>Look Up Building</h2>
 
-<form action="/admin/delete" method="POST">
+<form action="/admin/delete" method="POST" id="adminDeleteLookupForm">
   <div>
-    <label for="BuildingID">Building ID:</label>
+    <label for="deleteBIN">BIN Number:</label>
     <input
       type="number"
-      id="BuildingID"
-      name="BuildingID"
-      value="{{formData.BuildingID}}"
+      id="deleteBIN"
+      name="BIN"
+      value="{{formData.BIN}}"
+      min="1"
+      step="1"
       required
     >
   </div>
@@ -30,21 +32,20 @@
 {{#if building}}
   <h2>Confirm Delete</h2>
 
-  <p><strong>Building ID:</strong> {{building.BIN}}</p>
-  <p><strong>Address:</strong> {{building.address}}</p>
   <p><strong>BIN Number:</strong> {{building.BIN}}</p>
+  <p><strong>Address:</strong> {{building.address}}</p>
   <p><strong>Average Rating:</strong> {{building.avgRating}}</p>
   <p><strong>Reviews Count:</strong> {{building.reviewsCount}}</p>
 
- <form action="/admin/delete/confirm" method="POST">
-  <input
-    type="hidden"
-    name="BuildingID"
-    value="{{building.BIN}}"
-  />
+  <form action="/admin/delete/confirm" method="POST" id="adminDeleteConfirmForm">
+    <input
+      type="hidden"
+      name="BIN"
+      value="{{building.BIN}}"
+    >
 
-  <button type="submit">Confirm Delete</button>
-</form>
+    <button type="submit">Confirm Delete</button>
+  </form>
 {{/if}}
 
 <p><a href="/admin">Back to Admin Dashboard</a></p>

@@ -15,8 +15,12 @@ import { BuildingInputSchema } from '../data/models/Building.js';
 
 const router = Router();
 
-const BuildingIdFormSchema = z.object({
-  BuildingID: z.coerce.number().int().positive(),
+const BuildingBinFormSchema = z.object({
+  BIN: z.coerce.number().int().positive(),
+});
+
+const OriginalBinFormSchema = z.object({
+  originalBIN: z.coerce.number().int().positive(),
 });
 
 const BuildingUpdateExtraSchema = z.object({
@@ -31,7 +35,7 @@ const formatZodError = (error: z.ZodError): string => {
 const parseBuildingInputForm = (body: any) => {
   return BuildingInputSchema.safeParse({
     address: xss(body.Address || '').trim(),
-    BIN: Number(xss(body.binNumber || '').trim()),
+    BIN: Number(xss(body.BIN || '').trim()),
   });
 };
 
@@ -52,18 +56,7 @@ router.post('/add', async (req, res) => {
       error: formatZodError(parsed.error),
       formData: {
         Address: xss(req.body.Address || '').trim(),
-        binNumber: xss(req.body.binNumber || '').trim(),
-      },
-    });
-  }
-
-  if (parsed.data.address.length === 0) {
-    return res.status(400).render('admin/addBuilding', {
-      title: 'Add Building',
-      error: 'Address must be supplied',
-      formData: {
-        Address: parsed.data.address,
-        binNumber: parsed.data.BIN,
+        BIN: xss(req.body.BIN || '').trim(),
       },
     });
   }
@@ -81,7 +74,7 @@ router.post('/add', async (req, res) => {
       error: e,
       formData: {
         Address: parsed.data.address,
-        binNumber: parsed.data.BIN,
+        BIN: parsed.data.BIN,
       },
     });
   }
@@ -95,24 +88,24 @@ router.get('/delete', async (req, res) => {
   return res.render('admin/removeBuilding', { title: 'Delete Building' });
 });
 
-// This POST is for looking up the building first
+// Look up building by BIN before editing
 router.post('/edit', async (req, res) => {
-  const parsedId = BuildingIdFormSchema.safeParse({
-    BuildingID: xss(req.body.BuildingID || '').trim(),
+  const parsedBin = BuildingBinFormSchema.safeParse({
+    BIN: xss(req.body.BIN || '').trim(),
   });
 
-  if (!parsedId.success) {
+  if (!parsedBin.success) {
     return res.status(400).render('admin/editBuilding', {
       title: 'Edit Building',
-      error: formatZodError(parsedId.error),
+      error: formatZodError(parsedBin.error),
       formData: {
-        BuildingID: xss(req.body.BuildingID || '').trim(),
+        BIN: xss(req.body.BIN || '').trim(),
       },
     });
   }
 
   try {
-    const building = await getBuildingById(parsedId.data.BuildingID);
+    const building = await getBuildingById(parsedBin.data.BIN);
 
     return res.render('admin/editBuilding', {
       title: 'Edit Building',
@@ -123,16 +116,16 @@ router.post('/edit', async (req, res) => {
       title: 'Edit Building',
       error: e,
       formData: {
-        BuildingID: parsedId.data.BuildingID,
+        BIN: parsedBin.data.BIN,
       },
     });
   }
 });
 
-// This POST updates the building after the form is submitted
+// Submit edited building
 router.post('/edit/submit', async (req, res) => {
-  const parsedId = BuildingIdFormSchema.safeParse({
-    BuildingID: xss(req.body.BuildingID || '').trim(),
+  const parsedOriginalBin = OriginalBinFormSchema.safeParse({
+    originalBIN: xss(req.body.originalBIN || '').trim(),
   });
 
   const parsedBuilding = parseBuildingInputForm(req.body);
@@ -143,17 +136,18 @@ router.post('/edit/submit', async (req, res) => {
   });
 
   const formData = {
-    BIN: xss(req.body.BuildingID || '').trim(),
+    originalBIN: xss(req.body.originalBIN || '').trim(),
+    BIN: xss(req.body.BIN || '').trim(),
     address: xss(req.body.Address || '').trim(),
     avgRating: xss(req.body.AvgRating || '').trim(),
     reviewsCount: xss(req.body.ReviewsCount || '').trim(),
   };
 
-  if (!parsedId.success || !parsedBuilding.success || !parsedExtra.success) {
+  if (!parsedOriginalBin.success || !parsedBuilding.success || !parsedExtra.success) {
     let errorMessage = '';
 
-    if (!parsedId.success) {
-      errorMessage += formatZodError(parsedId.error) + '\n';
+    if (!parsedOriginalBin.success) {
+      errorMessage += formatZodError(parsedOriginalBin.error) + '\n';
     }
 
     if (!parsedBuilding.success) {
@@ -171,17 +165,9 @@ router.post('/edit/submit', async (req, res) => {
     });
   }
 
-  if (parsedBuilding.data.address.length === 0) {
-    return res.status(400).render('admin/editBuilding', {
-      title: 'Edit Building',
-      error: 'Address must be supplied',
-      building: formData,
-    });
-  }
-
   try {
     const updatedBuilding = await updateBuildingById(
-      parsedId.data.BuildingID,
+      parsedOriginalBin.data.originalBIN,
       parsedBuilding.data.address,
       parsedBuilding.data.BIN,
       parsedExtra.data.AvgRating,
@@ -202,24 +188,24 @@ router.post('/edit/submit', async (req, res) => {
   }
 });
 
-// This POST is only for looking up the building before deleting
+// Look up building by BIN before deleting
 router.post('/delete', async (req, res) => {
-  const parsedId = BuildingIdFormSchema.safeParse({
-    BuildingID: xss(req.body.BuildingID || '').trim(),
+  const parsedBin = BuildingBinFormSchema.safeParse({
+    BIN: xss(req.body.BIN || '').trim(),
   });
 
-  if (!parsedId.success) {
+  if (!parsedBin.success) {
     return res.status(400).render('admin/removeBuilding', {
       title: 'Delete Building',
-      error: formatZodError(parsedId.error),
+      error: formatZodError(parsedBin.error),
       formData: {
-        BuildingID: xss(req.body.BuildingID || '').trim(),
+        BIN: xss(req.body.BIN || '').trim(),
       },
     });
   }
 
   try {
-    const building = await getBuildingById(parsedId.data.BuildingID);
+    const building = await getBuildingById(parsedBin.data.BIN);
 
     return res.render('admin/removeBuilding', {
       title: 'Delete Building',
@@ -230,27 +216,27 @@ router.post('/delete', async (req, res) => {
       title: 'Delete Building',
       error: e,
       formData: {
-        BuildingID: parsedId.data.BuildingID,
+        BIN: parsedBin.data.BIN,
       },
     });
   }
 });
 
-// This POST deletes after confirmation
+// Delete after confirmation
 router.post('/delete/confirm', async (req, res) => {
-  const parsedId = BuildingIdFormSchema.safeParse({
-    BuildingID: xss(req.body.BuildingID || '').trim(),
+  const parsedBin = BuildingBinFormSchema.safeParse({
+    BIN: xss(req.body.BIN || '').trim(),
   });
 
-  if (!parsedId.success) {
+  if (!parsedBin.success) {
     return res.status(400).render('admin/removeBuilding', {
       title: 'Delete Building',
-      error: formatZodError(parsedId.error),
+      error: formatZodError(parsedBin.error),
     });
   }
 
   try {
-    await deleteBuildingById(parsedId.data.BuildingID);
+    await deleteBuildingById(parsedBin.data.BIN);
 
     return res.render('admin/removeBuilding', {
       title: 'Delete Building',
