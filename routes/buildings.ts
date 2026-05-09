@@ -20,7 +20,7 @@ router.get('/building/:id', async (req, res) => {
     const violations = await getViolationsByBuildingId(buildingId);
     //ratings based on the violations and a summary of what violations the building has(Rahim)
     // the data function is in data/violations.ts and is called calculateRatingByViolations(Rahim)
-    const violationSummary = calculateRatingByViolations(building.BIN);
+    const violationSummary = await calculateRatingByViolations(building.BIN);
     //
     const vioClassCounts = {
       C: violations.filter((v) => v.class === 'C').length,
@@ -77,7 +77,8 @@ router.get('/building/:id', async (req, res) => {
     //Form submissions confirmations
     const review_confirm_submit = req.query['reviewSubmitted'];
     const comment_confirm_submit = req.query['commentSubmitted'];
-
+    //added this here for the favorites button incase there is a duplicate(Rahim)
+    const favorite_exists = req.query['favoriteExists'];
     res.render('building', {
       building,
       reviews,
@@ -90,6 +91,7 @@ router.get('/building/:id', async (req, res) => {
       comment_confirm_submit,
       //just added this but you still need to diplay it in handlebars, i didn't tuch that(Rahim)
       violationSummary,
+      favorite_exists,
     });
   } catch (e) {
     res.status(404).render('error', { title: 'Error', error: e });

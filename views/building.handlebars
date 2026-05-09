@@ -23,7 +23,9 @@
   <p>Avg Rating: {{building.avgRating}}</p>
   <p>Reviews Count: {{building.reviewsCount}}</p>
   <p>Violations Count: {{violations_count}}</p>
-
+      {{#if favorite_exists}}
+  <p class="error">This building has already been favorited by you.</p>
+{{/if}}
       <form action="/favorites/{{building._id}}" method="POST">
       <button type="submit">
         Save to Favorites

@@ -46,7 +46,7 @@ export const removeFavBuilding = async (userId: string, buildingId: string) => {
 export const getFavBuildings = async (userId: string) => {
   if (!Types.ObjectId.isValid(userId)) throw 'Invalid user ID';
 
-  const user = await UserModel.findById(userId).populate('savedBuildings');
+  const user = await UserModel.findById(userId).populate('savedBuildings').lean();
 
   if (!user) throw 'User not found';
 
