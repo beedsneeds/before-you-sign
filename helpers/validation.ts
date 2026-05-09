@@ -23,6 +23,8 @@ export const checkString = (
   if (invalidChars.test(str)) {
     throw `Error: ${str} constains invalid characters.`;
   }
+import * as z from 'zod';
 
   return str;
 };
+export const formatZodError = (err: z.ZodError): string => z.prettifyError(err);

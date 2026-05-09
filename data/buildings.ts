@@ -1,90 +1,13 @@
-// mongoose switch import
-import { BuildingInputSchema, BuildingModel, type Building } from './models/Building.js';
+import * as z from 'zod';
+import {
+  BuildingInputSchema,
+  BuildingStoredSchema,
+  BuildingModel,
+  type Building,
+} from './models/Building.js';
+import { formatZodError } from '../helpers/validation.js';
 
-const checkBuildingID = (buildingID: string | number): number => {
-  if (buildingID === undefined || buildingID === null || buildingID === '') {
-    throw 'Building ID must be supplied';
-  }
-
-  if (typeof buildingID === 'string') {
-    buildingID = buildingID.trim();
-  }
-
-  const id = Number(buildingID);
-
-  if (isNaN(id)) throw 'Building ID must be a number';
-  if (!Number.isInteger(id)) throw 'Building ID must be a whole number';
-  if (id <= 0) throw 'Building ID must be positive';
-
-  return id;
-};
-
-const checkAddress = (address: unknown): string => {
-  if (!address) throw 'Address must be supplied';
-  if (typeof address !== 'string') throw 'Address must be a string';
-
-  const trimmed = address.trim();
-
-  if (trimmed.length === 0) throw 'Address cannot be empty';
-
-  return trimmed;
-};
-
-const checkBIN = (binNumber: string | number): number => {
-  if (binNumber === undefined || binNumber === null || binNumber === '') {
-    throw 'BIN number must be supplied';
-  }
-  if (typeof binNumber === 'string') {
-    binNumber = binNumber.trim();
-  }
-
-  const bin = Number(binNumber);
-
-  if (isNaN(bin)) throw 'BIN number must be a number';
-  if (!Number.isInteger(bin)) throw 'BIN number must be a whole number';
-  if (bin <= 0) throw 'BIN number must be positive';
-
-  return bin;
-};
-
-const checkRating = (avgRating: string | number): number => {
-  if (avgRating === undefined || avgRating === null || avgRating === '') {
-    throw 'Average rating must be supplied';
-  }
-
-  if (typeof avgRating === 'string') {
-    avgRating = avgRating.trim();
-  }
-
-  const rating = Number(avgRating);
-
-  if (isNaN(rating)) throw 'Average rating must be a number';
-  if (rating < 0 || rating > 5) {
-    throw 'Average rating must be between 0 and 5';
-  }
-
-  return rating;
-};
-
-const checkReviewsCount = (reviewsCount: string | number): number => {
-  if (reviewsCount === undefined || reviewsCount === null || reviewsCount === '') {
-    throw 'Reviews count must be supplied';
-  }
-
-  if (typeof reviewsCount === 'string') {
-    reviewsCount = reviewsCount.trim();
-  }
-
-  const count = Number(reviewsCount);
-
-  if (isNaN(count)) throw 'Reviews count must be number';
-  if (!Number.isInteger(count)) {
-    throw 'Reviews count must be whole number';
-  }
-  if (count < 0) throw 'Reviews count cannot be negative';
-
-  return count;
-};
+const BuildingIdSchema = z.coerce.number().int().positive();
 
 export const createBuilding = async (
   address: string,
@@ -95,13 +18,7 @@ export const createBuilding = async (
     BIN: Number(binNumber),
   });
 
-  if (!parsed.success) {
-    throw parsed.error.issues.map((issue) => issue.message).join(', ');
-  }
-
-  if (parsed.data.address.length === 0) {
-    throw 'Address cannot be empty';
-  }
+  if (!parsed.success) throw formatZodError(parsed.error);
 
   const existingBuilding = await BuildingModel.findOne({
     BIN: parsed.data.BIN,
@@ -122,13 +39,10 @@ export const createBuilding = async (
 };
 
 export const getBuildingById = async (buildingID: string | number): Promise<Building> => {
-  buildingID = checkBuildingID(buildingID);
+  const parsed = BuildingIdSchema.safeParse(buildingID);
+  if (!parsed.success) throw formatZodError(parsed.error);
 
-  const building = await BuildingModel.findOne({
-    BIN: Number(buildingID),
-  });
-  console.log('SEARCH BIN:', buildingID);
-  console.log('FOUND:', building);
+  const building = await BuildingModel.findOne({ BIN: parsed.data });
 
   if (!building) throw 'No building found with that Building ID';
 
@@ -142,11 +56,16 @@ export const updateBuildingById = async (
   avgRating: string | number,
   reviewsCount: string | number,
 ): Promise<Building> => {
-  buildingID = checkBuildingID(buildingID);
-  address = checkAddress(address);
-  binNumber = checkBIN(binNumber);
-  avgRating = checkRating(avgRating);
-  reviewsCount = checkReviewsCount(reviewsCount);
+  const parsedId = BuildingIdSchema.safeParse(buildingID);
+  if (!parsedId.success) throw formatZodError(parsedId.error);
+
+  const parsed = BuildingStoredSchema.safeParse({
+    address: address,
+    BIN: Number(binNumber),
+    avgRating: Number(avgRating),
+    reviewsCount: Number(reviewsCount),
+  });
+  if (!parsed.success) throw formatZodError(parsed.error);
 
   const existingBuilding = await BuildingModel.findOne({
     BIN: Number(binNumber),
@@ -157,12 +76,12 @@ export const updateBuildingById = async (
   }
 
   const updated = await BuildingModel.findOneAndUpdate(
-    { BIN: Number(buildingID) },
+    { BIN: parsedId.data },
     {
-      address: address,
-      BIN: Number(binNumber),
-      avgRating: avgRating,
-      reviewsCount: reviewsCount,
+      address: parsed.data.address,
+      BIN: parsed.data.BIN,
+      avgRating: parsed.data.avgRating,
+      reviewsCount: parsed.data.reviewsCount,
     },
     { new: true },
   );
@@ -175,11 +94,10 @@ export const updateBuildingById = async (
 };
 
 export const deleteBuildingById = async (buildingID: string | number): Promise<boolean> => {
-  buildingID = checkBuildingID(buildingID);
+  const parsed = BuildingIdSchema.safeParse(buildingID);
+  if (!parsed.success) throw formatZodError(parsed.error);
 
-  const deleted = await BuildingModel.findOneAndDelete({
-    BIN: Number(buildingID),
-  });
+  const deleted = await BuildingModel.findOneAndDelete({ BIN: parsed.data });
 
   if (!deleted) {
     throw 'Unable to delete building';
@@ -193,21 +111,25 @@ export const searchBuildings = async (searchTerm: string): Promise<Building[]> =
     throw 'Search term must be supplied';
   }
 
-  const term = searchTerm.trim().toLowerCase();
+  const term = searchTerm.trim();
 
   if (term.length === 0) {
     throw 'Search term cannot be empty';
   }
 
-  const buildings = await BuildingModel.find({});
+  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const addressRegex = new RegExp(escaped, 'i');
 
-  const results = buildings.filter((building) => {
-    const addressMatch = building.address.toLowerCase().includes(term);
+  const query = /^\d+$/.test(term)
+    ? {
+        $or: [
+          { address: addressRegex },
+          { $expr: { $regexMatch: { input: { $toString: '$BIN' }, regex: term } } },
+        ],
+      }
+    : { address: addressRegex };
 
-    const binMatch = building.BIN.toString().includes(term);
-
-    return addressMatch || binMatch;
-  });
+  const results = await BuildingModel.find(query);
 
   return results.map((building) => building.toObject());
 };

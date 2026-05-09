@@ -12,6 +12,7 @@ import {
 } from '../data/buildings.js';
 
 import { BuildingInputSchema } from '../data/models/Building.js';
+import { formatZodError } from '../helpers/validation.js';
 
 const router = Router();
 
@@ -27,10 +28,6 @@ const BuildingUpdateExtraSchema = z.object({
   AvgRating: z.coerce.number().min(0).max(5),
   ReviewsCount: z.coerce.number().int().nonnegative(),
 });
-
-const formatZodError = (error: z.ZodError): string => {
-  return z.prettifyError(error);
-};
 
 const parseBuildingInputForm = (body: any) => {
   return BuildingInputSchema.safeParse({
