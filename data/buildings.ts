@@ -148,9 +148,16 @@ export const updateBuildingById = async (
   avgRating = checkRating(avgRating);
   reviewsCount = checkReviewsCount(reviewsCount);
 
+  const existingBuilding = await BuildingModel.findOne({
+    BIN: Number(binNumber),
+  });
+
+  if (existingBuilding && existingBuilding.BIN !== Number(buildingID)) {
+    throw 'A building with that BIN already exists';
+  }
+
   const updated = await BuildingModel.findOneAndUpdate(
     { BIN: Number(buildingID) },
-
     {
       address: address,
       BIN: Number(binNumber),
@@ -159,8 +166,6 @@ export const updateBuildingById = async (
     },
     { new: true },
   );
-
-  console.log('updated:', updated);
 
   if (!updated) {
     throw 'Could not update building';

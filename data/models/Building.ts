@@ -4,8 +4,13 @@ import { Schema, model, type HydratedDocument } from 'mongoose';
 // See data/models/README.md
 
 export const BuildingInputSchema = z.object({
-  address: z.string().normalize().trim().max(200),
-  BIN: z.number().positive().int(),
+  address: z
+    .string()
+    .normalize()
+    .trim()
+    .min(1, 'Address must be supplied')
+    .max(200, 'Address cannot be more than 200 characters'),
+  BIN: z.number().positive('BIN must be positive').int('BIN must be a whole number'),
 });
 
 // These have to be cached to prevent unnecessary db calls
