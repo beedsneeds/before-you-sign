@@ -1,5 +1,6 @@
-import { Router } from 'express';
-import { getUserProfileById, updateUserProfile } from '../data/profile.js';
+import { Router } from "express";
+import xss from "xss";
+import { getUserProfileById, updateUserProfile } from "../data/profile.js";
 
 const router = Router();
 
@@ -7,50 +8,65 @@ const requireLogin = (req, res, next) => {
   const sessionInfo = req.session as any;
 
   if (!sessionInfo?.user) {
-    return res.redirect('/signin');
+    return res.redirect("/signin");
   }
 
   next();
 };
 
-router.get('/', requireLogin, async (req, res) => {
+router.get("/", requireLogin, async (req, res) => {
   try {
     const sessionInfo = req.session as any;
     const profile = await getUserProfileById(sessionInfo.user.userId);
 
-    return res.render('profile', {
-      title: 'Profile',
+    return res.render("profile", {
+      title: "Profile",
       user: profile.user,
       savedBuildings: profile.savedBuildings,
       reviews: profile.reviews,
       comments: profile.comments,
     });
   } catch (e) {
-    return res.status(404).render('error', { title: 'Error', error: e });
+    return res.status(400).render("error", {
+      title: "Error",
+      error: "Profile update failed.",
+      backLink: "/profile",
+      backLinkText: "Return to profile",
+    });
   }
 });
 
-router.get('/edit', requireLogin, async (req, res) => {
+router.get("/edit", requireLogin, async (req, res) => {
   try {
     const sessionInfo = req.session as any;
     const profile = await getUserProfileById(sessionInfo.user.userId);
 
-    return res.render('register', {
-      title: 'Edit Profile',
+    return res.render("register", {
+      title: "Edit Profile",
       isEditing: true,
-      action: '/profile/edit',
+      action: "/profile/edit",
       firstName: profile.user.firstName,
       lastName: profile.user.lastName,
       email: profile.user.email,
     });
   } catch (e) {
-    return res.status(404).render('error', { title: 'Error', error: e });
+    return res.status(400).render("error", {
+      title: "Error",
+      error: "Profile update failed.",
+      backLink: "/profile",
+      backLinkText: "Return to profile",
+    });
   }
 });
 
-router.post('/edit', requireLogin, async (req, res) => {
+router.post("/edit", requireLogin, async (req, res) => {
   const sessionInfo = req.session as any;
-  const { firstName, lastName, email, password } = req.body;
+  const firstName = xss(req.body.firstName || "").trim();
+  const lastName = xss(req.body.lastName || "").trim();
+  const email = xss(req.body.email || "")
+    .trim()
+    .toLowerCase();
+  const password = req.body.password;
 
   try {
     const updatedUser = await updateUserProfile(
@@ -69,12 +85,12 @@ router.post('/edit', requireLogin, async (req, res) => {
       isAdmin: updatedUser.isAdmin,
     };
 
-    return res.redirect('/profile');
+    return res.redirect("/profile");
   } catch (e) {
-    return res.status(400).render('register', {
-      title: 'Edit Profile',
+    return res.status(400).render("register", {
+      title: "Edit Profile",
       isEditing: true,
-      action: '/profile/edit',
+      action: "/profile/edit",
       error: e,
       firstName,
       lastName,

@@ -1,17 +1,59 @@
 import mongoose, { Types } from "mongoose";
 import bcrypt from "bcrypt";
 import { connect, disconnect } from "../config/mongoConnection.js";
-import { tick } from "../cron/cron.js";
+import { tick, startCron } from "../cron/cron.js";
 import { UserModel } from "../models/User.js";
 import { BuildingModel } from "../models/Building.js";
 import { ReviewModel } from "../models/Review.js";
 import { CommentModel } from "../models/Comment.js";
+import { existsSync, promises as fsPromises } from "node:fs";
+import { join } from "node:path";
+import readline from "node:readline/promises";
+import { stdin as input, stdout as output } from "node:process";
 
 const hashPassword = (password: string) => bcrypt.hash(password, 10);
+
+const CRON_DIR = join("data", "cron");
+const CSV_PATH = join(CRON_DIR, "violations.csv");
+const MINIMUM_RELEASE_ROWS = 5000;
+
+const countCsvRows = async (filePath: string): Promise<number> => {
+  const content = await fsPromises.readFile(filePath, "utf8");
+  if (!content.trim()) return 0;
+  return content.trim().split("\n").length - 1;
+};
+
+const prepareCsv = async (): Promise<boolean> => {
+  if (existsSync(CSV_PATH)) {
+    const rowCount = await countCsvRows(CSV_PATH);
+    if (rowCount >= MINIMUM_RELEASE_ROWS) {
+      console.log(
+        `Using existing violations.csv with ${rowCount} rows. Skipping cron and validation queries.`,
+      );
+      return false;
+    }
+
+    console.log(
+      `Found violations.csv with ${rowCount} rows, deleting it so the cron can recreate a fresh file.`,
+    );
+    await fsPromises.unlink(CSV_PATH);
+  }
+
+  return true;
+};
+
+const promptContinue = async (): Promise<boolean> => {
+  const rl = readline.createInterface({ input, output });
+  const answer = await rl.question("Continue cron job or terminate? (continue/terminate): ");
+  rl.close();
+  return answer.trim().toLowerCase().startsWith("c");
+};
 
 const main = async () => {
   await connect();
   await mongoose.connection.dropDatabase();
+
+  const needsCron = await prepareCsv();
 
   const adminId = new Types.ObjectId();
   const userId = new Types.ObjectId();
@@ -116,10 +158,39 @@ const main = async () => {
     },
   ]);
 
-  // Seed real cron data after inserting the two users.
+  if (!needsCron) {
+    console.log(
+      "Seeded users, buildings, reviews, and comments. CSV already exists, so no cron ticks were run.",
+    );
+    await disconnect();
+    return;
+  }
+
+  console.log(
+    "A fresh violations.csv is required. Running first cron tick to pull the initial rows from the API...",
+  );
   await tick(false);
 
-  console.log("Database seeded successfully");
+  const firstContinue = await promptContinue();
+  if (!firstContinue) {
+    console.log("Seed complete; terminating after first tick.");
+    await disconnect();
+    return;
+  }
+
+  console.log("Running second cron tick to pull any newer rows...");
+  await tick(false);
+
+  const secondContinue = await promptContinue();
+  if (!secondContinue) {
+    console.log("Seed complete; terminating after second tick.");
+    await disconnect();
+    return;
+  }
+
+  console.log("Continuing cron job...");
+  await startCron();
+
   await disconnect();
 };
 
