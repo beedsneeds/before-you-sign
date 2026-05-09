@@ -36,11 +36,13 @@ router.post('/favorites/:buildingId', async (req, res) => {
     }
 
     const buildingId = req.params.buildingId;
+    const result = await addFavBuilding(user.userId, buildingId);
 
-    await addFavBuilding(user.userId, buildingId);
+    if (result.alreadyFavorited) {
+      return res.redirect(req.get('Referrer') + '?favoriteExists=true');
+    }
+
     return res.redirect('/favorites');
-
-    return res.redirect(req.get('Referrer') || '/favorites');
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Error',
@@ -62,7 +64,7 @@ router.post('/favorites/:buildingId/remove', async (req, res) => {
 
     await removeFavBuilding(user.userId, buildingId);
 
-    return res.redirect(req.get('Referrer') || '/favorites');
+    return res.redirect('/favorites');
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Error',
