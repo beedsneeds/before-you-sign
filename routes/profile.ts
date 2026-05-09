@@ -1,10 +1,10 @@
-import { Router } from "express";
 import xss from "xss";
-import { getUserProfileById, updateUserProfile } from "../data/profile.js";
+import { Router, type Request, type Response, type NextFunction } from 'express';
+import { getUserProfileById, updateUserProfile } from '../data/profile.js';
 
 const router = Router();
 
-const requireLogin = (req, res, next) => {
+const requireLogin = (req: Request, res: Response, next: NextFunction) => {
   const sessionInfo = req.session as any;
 
   if (!sessionInfo?.user) {

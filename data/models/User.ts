@@ -5,15 +5,33 @@ import { Schema, model, type HydratedDocument } from 'mongoose';
 // See data/models/README.md
 
 export const UserInputSchema = z.object({
-  firstName: z.string().trim().max(40),
-  lastName: z.string().trim().max(40),
-  email: z.email(),
-  password: z.string().min(8).max(128),
+  firstName: z
+    .string()
+    .trim()
+    .min(2)
+    .max(50)
+    .regex(/^[a-zA-Z ]+$/, 'first name must contain only letters and spaces'),
+  lastName: z
+    .string()
+    .trim()
+    .min(2)
+    .max(50)
+    .regex(/^[a-zA-Z ]+$/, 'last name must contain only letters and spaces'),
+  email: z.email().min(5).max(255),
+  password: z
+    .string()
+    .min(8)
+    .max(128)
+    .regex(/^\S+$/, 'password must not contain whitespace')
+    .regex(/[A-Z]/, 'password must contain an uppercase letter')
+    .regex(/[0-9]/, 'password must contain a number')
+    .regex(/[^a-zA-Z0-9]/, 'password must contain a special character'),
 });
 
 export const UserStoredSchema = UserInputSchema.omit({ password: true }).extend({
   hashedPassword: z.string(),
   isAdmin: z.boolean(),
+  activityScore: z.number().int().nonnegative(),
   savedBuildings: z.array(z.instanceof(Types.ObjectId)),
   reviewIds: z.array(z.instanceof(Types.ObjectId)),
   commentIds: z.array(z.instanceof(Types.ObjectId)),
@@ -28,6 +46,7 @@ const UserDbSchema = new Schema<User>({
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   hashedPassword: { type: String, required: true },
   isAdmin: { type: Boolean, required: true, default: false },
+  activityScore: { type: Number, required: true, default: 0, min: 0 },
   savedBuildings: [{ type: Schema.Types.ObjectId, ref: 'Building' }],
   reviewIds: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
   commentIds: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],

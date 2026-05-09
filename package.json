@@ -25,6 +25,7 @@
     "bcrypt": "^6.0.0",
     "bson": "^7.2.0",
     "csv-parse": "^6.2.1",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-handlebars": "^9.0.1",
     "express-session": "^1.19.0",
@@ -32,7 +33,9 @@
     "mongodb": "^7.1.0",
     "mongodb-connection-string-url": "^7.0.1",
     "mongoose": "^9.5.0",
+    "nodemailer": "^8.0.7",
     "punycode": "^2.3.1",
+    "resend": "^6.12.3",
     "sparse-bitfield": "^3.0.3",
     "tr46": "^5.1.1",
     "typescript": "^6.0.3",
@@ -46,6 +49,7 @@
     "@types/express": "^5.0.6",
     "@types/express-handlebars": "^5.3.1",
     "@types/express-session": "^1.19.0",
+    "@types/nodemailer": "^8.0.0",
     "prettier": "^3.8.3",
     "tsx": "^4.21.0"
   }
