@@ -35,7 +35,8 @@ router.get('/building/:id', async (req, res) => {
     const violations = await getViolationsByBuildingId(buildingId);
     //ratings based on the violations and a summary of what violations the building has(Rahim)
     // the data function is in data/violations.ts and is called calculateRatingByViolations(Rahim)
-    const violationSummary = calculateRatingByViolations(building.BIN);
+    const violationSummary = await calculateRatingByViolations(building.BIN);
+    console.log(violationSummary);
     //
     const vioClassCounts = {
       C: violations.filter((v) => v.class === 'C').length,

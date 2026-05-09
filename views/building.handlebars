@@ -17,9 +17,16 @@
   <div class="overview-card">
     <h1>{{building.address}}</h1>
     <p>BIN: {{building.BIN}}</p>
-    <p>Avg Rating: {{building.avgRating}}</p>
-    <p>Reviews Count: {{building.reviewsCount}}</p>
+    <p>Avg Rating: {{building.avgRating}}
+      ({{building.reviewsCount}} reviews)
+    </p>
     <p>Violations Count: {{violations_count}}</p>
+    <p>Building Safety Score: {{violationSummary.rating}} / 5</p>
+    <p>Total Violations: {{violationSummary.totalViolations}}</p>
+
+
+    <p class="small-text">
+      *Based on building violations and severity levels. Higher scores indicate better safety.</p>
   </div>
 </section>
 

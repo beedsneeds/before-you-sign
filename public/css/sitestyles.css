@@ -397,6 +397,9 @@ td:last-child {
 .vio-count {
   font-size: 28px;
 }
+.small-text {
+  font-size: 0.8rem;
+}
 
 /* Forum style*/
 
