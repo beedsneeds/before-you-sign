@@ -65,8 +65,51 @@ for (let i = 0; i < topicButtons.length; i++) {
   });
 }
 
+// stay on overview after submit
 if (window.location.search.includes('commentSubmitted=true')) {
   hideAllSections();
 
   commentsSection.style.display = 'block';
+}
+
+if (window.location.search.includes('reviewSubmitted=true')) {
+  hideAllSections();
+
+  reviewsSection.style.display = 'block';
+}
+
+
+// review validation
+const reviewForm = document.querySelector('#reviews form');
+
+if (reviewForm) {
+  reviewForm.addEventListener('submit', function (e) {
+    const reviewText = document.getElementById('reviewText').value.trim();
+    const rating = Number(document.getElementById('rating').value);
+    
+
+    if (!reviewText || reviewText.length < 10) {
+      e.preventDefault();
+      alert('Review must be at least 10 characters.');
+    }
+
+    if (rating < 1 || rating > 5) {
+      e.preventDefault();
+      alert('Rating must be between 1 and 5.');
+    }
+  });
+}
+
+// comment and topic validation
+const commentForm = document.querySelector('#comments > form');
+
+if (commentForm) {
+  commentForm.addEventListener('submit', function(e) {
+    const title = document.getElementById('topicTitle').value.trim();
+
+    if (!title || title.length <5) {
+      e.preventDefault();
+      alert('Topic name cannot be empty.');
+    }
+  });
 }

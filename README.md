@@ -1,5 +1,15 @@
 # Before You Sign
 
+### steps to run Before You Sign
+- [ ] run `npm run seeddb` to seed databases. This may take a while before you are prompted to continue/terminate.
+- [ ] once database seeded, run `npm run dev`
+- [ ] seeddb provides an admin user and 2 basic users: "sudo@gmail.com", "normal@gmail.com" & "zohran@nyc.com" repectively. Their passwords can be found in the seed.ts file. You can of course also create your own users.
+
+### important notes
+- notifications, while functional, can only work for the current logged in user (shortcomings of working with free software).
+- for notifications to work you must generate the api key <>?
+- 
+
 #### TODO
 
 - Pairwise evaluation of previous lab specs and relevance in their contribution to the project
@@ -40,3 +50,20 @@ Strong Typechecking tips:
 
 Use the .js extension _only_ for import paths even if the actual file is a .ts
 We will not set allowImportingTsExtensions
+
+#### Testing
+
+## Testing Associated Buildings
+
+The Associated Buildings feature REQUIRES the violations dataset and cron ingestion setup.
+
+Before testing this feature, finish Step 1 and 2 in:
+`data/cron/README.md`
+
+Then run:
+
+```bash
+npx tsx data/cron/cron.ts
+```
+
+To test the feature, search for BIN 1077517

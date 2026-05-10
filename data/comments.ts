@@ -1,34 +1,24 @@
 import { Types } from 'mongoose';
-import { CommentModel, type Comment } from './models/Comment.js';
+import { CommentModel, CommentInputSchema, type Comment } from './models/Comment.js';
 
 export const getCommentsByBuildingId = async (buildingId: Types.ObjectId): Promise<Comment[]> => {
-  const comments = await CommentModel.find({ buildingId: buildingId });
+  const comments = await CommentModel.find({ buildingId: buildingId }).populate('userId', 'firstName');
   return comments.map((comment: any) => comment.toObject());
 };
 
 export const addComment = async (
   buildingId: Types.ObjectId,
   topicTitle: string,
+  userId: Types.ObjectId,
 ) => {
   
-  if (!topicTitle || typeof topicTitle !== 'string') {
-    throw 'Topic title must be supplied';
-  }
-
-  topicTitle = topicTitle.trim();
-
-  if (topicTitle.length === 0) {
-    throw 'Topic title cannot be empty';
-  }
-
-  if (topicTitle.length < 5) {
-    throw 'Topic title must be at least 5 characters';
-  }
+  const parsed = CommentInputSchema.safeParse({ buildingId, topicTitle });
+  if (!parsed.success) throw parsed.error.flatten();
 
   const newComment = await CommentModel.create({
     buildingId: buildingId,
     topicTitle: topicTitle,
-    userId: new Types.ObjectId(),
+    userId: userId,
     timeCreated: new Date(),
   });
 
