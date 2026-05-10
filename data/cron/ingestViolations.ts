@@ -104,12 +104,19 @@ export const ingestViolations = async ({ collectNew = false }: { collectNew?: bo
     const boro = BORO_NAMES[data.boroId - 1];
 
     try {
+      // 0 = unregistered owner — treat as absent so we don't index a meaningless value
+      const regID = data.registrationId && data.registrationId > 0 ? data.registrationId : undefined;
+
       let building = await BuildingModel.findOne({ BIN: data.bin });
       if (!building) {
         building = await BuildingModel.create({
           BIN: data.bin,
           address: formatAddress(data.houseNumber, data.streetName, data.zip, boro),
+          regID,
         });
+      } else if (regID && !building.regID) {
+        building.regID = regID;
+        await building.save();
       }
 
       const violation = await ViolationModel.findOne({ violationId: data.violationId });

@@ -32,10 +32,10 @@
 {{#if building}}
   <h2>Confirm Delete</h2>
 
-  <p><strong>BIN Number:</strong> {{building.BIN}}</p>
-  <p><strong>Address:</strong> {{building.address}}</p>
-  <p><strong>Average Rating:</strong> {{building.avgRating}}</p>
-  <p><strong>Reviews Count:</strong> {{building.reviewsCount}}</p>
+  <p><span class="label">BIN Number:</span> {{building.BIN}}</p>
+  <p><span class="label">Address:</span> {{building.address}}</p>
+  <p><span class="label">Average Rating:</span> {{building.avgRating}}</p>
+  <p><span class="label">Reviews Count:</span> {{building.reviewsCount}}</p>
 
   <form action="/admin/delete/confirm" method="POST" id="adminDeleteConfirmForm">
     <input

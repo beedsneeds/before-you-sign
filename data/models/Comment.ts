@@ -3,6 +3,7 @@ import { Types } from 'mongoose';
 import { Schema, model, type HydratedDocument } from 'mongoose';
 
 // See data/models/README.md
+//REMEMBER, comments are now called topics in "Forum" in buildings
 
 export const CommentInputSchema = z.object({
   buildingId: z.instanceof(Types.ObjectId),

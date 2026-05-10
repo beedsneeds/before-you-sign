@@ -2,6 +2,7 @@ import * as z from "zod";
 import { Types } from "mongoose";
 import { ReviewModel, ReviewInputSchema, type Review } from "./models/Review.js";
 import { BuildingModel } from "./models/Building.js";
+import { addKarma, KARMA_PER_CONTRIBUTION } from "./users.js";
 import { formatZodError } from "../helpers/validation.js";
 //import { getUserProfileById } from "./profile.js";
 
@@ -64,6 +65,8 @@ export const addReview = async (
     avgRating: avgRating,
     reviewsCount: reviewsCount,
   });
+
+  await addKarma(userId, KARMA_PER_CONTRIBUTION);
 
   return newReview;
 };

@@ -13,17 +13,17 @@
         {{#if this.building}}
           <a href='/building/{{this.building.BIN}}'>{{this.building.address}}</a>
         {{else}}
-          <em>(this building was removed)</em>
+          <span class="note">(this building was removed)</span>
         {{/if}}
 
         {{#if this.violation}}
-          <strong>Class {{this.violation.class}}</strong>:
+          <span class="label">Class {{this.violation.class}}</span>:
           {{this.violation.description}}
-          <em>({{this.violation.currentStatus}})</em>
+          <span class="note">({{this.violation.currentStatus}})</span>
         {{/if}}
 
         <br />
-        <small>{{this.createdAt}}</small>
+        <span class="small-text">{{this.createdAt}}</span>
       </li>
     {{/each}}
   </ul>
