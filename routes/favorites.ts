@@ -1,5 +1,6 @@
 import { Router } from "express";
 import xss from "xss";
+import { BinSchema } from "../helpers/validation.js";
 import { addFavBuilding, removeFavBuilding, getFavBuildings } from "../data/favorites.js";
 
 const router = Router();
@@ -43,9 +44,16 @@ router.post("/favorites/:buildingId", async (req, res) => {
       return res.redirect("/signin");
     }
 
-    const buildingId = xss(req.params.buildingId || "").trim();
+    const parsedBin = BinSchema.safeParse(xss(req.params.buildingId || "").trim());
+    if (!parsedBin.success) {
+      return res.status(400).render("error", {
+        title: "Error",
+        error: "Invalid building reference.",
+      });
+    }
+
     const redirectTo = safeRedirect(req.body.redirectTo ?? req.get("Referrer"));
-    const result = await addFavBuilding(user.userId, buildingId);
+    const result = await addFavBuilding(user.userId, parsedBin.data);
 
     if (result.alreadyFavorited) {
       return res.redirect(
@@ -71,10 +79,17 @@ router.post("/favorites/:buildingId/remove", async (req, res) => {
       return res.redirect("/signin");
     }
 
-    const buildingId = xss(req.params.buildingId || "").trim();
+    const parsedBin = BinSchema.safeParse(xss(req.params.buildingId || "").trim());
+    if (!parsedBin.success) {
+      return res.status(400).render("error", {
+        title: "Error",
+        error: "Invalid building reference.",
+      });
+    }
+
     const redirectTo = safeRedirect(req.body.redirectTo ?? req.get("Referrer"));
 
-    await removeFavBuilding(user.userId, buildingId);
+    await removeFavBuilding(user.userId, parsedBin.data);
 
     return res.redirect(redirectTo);
   } catch (e) {

@@ -22,8 +22,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   console.log('email sent');
   try {
     const data = await sendEmail({
-      to: 'rviwt2018@gmail.com',
-      // to: 'YOUR.EMAIL@example.com',
+      to: 'YOUR.EMAIL@example.com',
       subject: `Test ${new Date().toISOString()}`,
       html: `<p>Test send at ${new Date().toISOString()}</p>`,
     });

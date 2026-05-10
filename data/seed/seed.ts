@@ -55,8 +55,6 @@ const main = async () => {
       activityScore: 10,
       savedBuildings: [building1Id, building2Id],
       notificationPrefs: ["email", "inApp"],
-      reviewIds: [review1Id],
-      commentIds: [topic2Id],
     },
     {
       _id: userId,
@@ -68,8 +66,6 @@ const main = async () => {
       activityScore: 5,
       savedBuildings: [building2Id],
       notificationPrefs: ["inApp"],
-      reviewIds: [review2Id],
-      commentIds: [topic1Id],
     },
 
     {
@@ -81,9 +77,6 @@ const main = async () => {
       isAdmin: true,
 
       savedBuildings: [],
-
-      reviewIds: [review3Id],
-      commentIds: [topic3Id],
     },
   ]);
 

@@ -1,15 +1,8 @@
-import * as z from 'zod';
-import { Types } from 'mongoose';
 import { UserModel } from './models/User.js';
 import { BuildingModel } from './models/Building.js';
-import { formatZodError } from '../helpers/validation.js';
+import { BinSchema, ObjectIdSchema, formatZodError } from '../helpers/validation.js';
 
-const UserIdSchema = z
-  .string()
-  .refine((s) => Types.ObjectId.isValid(s), { message: 'Invalid user ID' })
-  .transform((s) => new Types.ObjectId(s));
-
-const BinSchema = z.coerce.number().int().positive();
+const UserIdSchema = ObjectIdSchema;
 
 export const addFavBuilding = async (userId: string, buildingBIN: string | number) => {
   const parsedUid = UserIdSchema.safeParse(userId);

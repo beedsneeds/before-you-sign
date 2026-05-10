@@ -1,18 +1,23 @@
 import { Router } from "express";
 import xss from "xss";
+import { Types } from "mongoose";
+import { BinSchema, ObjectIdSchema, formatZodError } from "../helpers/validation.js";
+import { AddReviewSchema } from "../data/reviews.js";
+import { CommentInputSchema } from "../data/models/Comment.js";
+import { ReplyInputSchema } from "../data/models/Reply.js";
 import { getBuildingById } from "../data/buildings.js";
 import { calculateRatingByViolations } from "../data/violations.js";
-import { getReviewsByBuildingId } from "../data/reviews.js";
-import { getCommentsByBuildingId } from "../data/comments.js";
-import { addComment } from "../data/comments.js";
+import { getReviewsByBuildingId, getReviewByUserAndBuilding } from "../data/reviews.js";
+import { getCommentsByBuildingId, addComment } from "../data/comments.js";
 import { addReview } from "../data/reviews.js";
 import { getViolationsByBuildingId, getBuildingsByRegID } from "../data/violations.js";
-import { addReply } from "../data/replies.js";
+import { addReply, getRepliesByTopicId } from "../data/replies.js";
 import { getFavBuildings } from "../data/favorites.js";
-import { Types } from "mongoose";
-import { getRepliesByTopicId } from "../data/replies.js";
 
 const router = Router();
+
+const TopicTitleFormSchema = CommentInputSchema.pick({ topicTitle: true });
+const ReplyFormSchema = ReplyInputSchema.pick({ replyText: true });
 
 // building route plus trycatch
 router.get("/building/:id", async (req, res) => {
@@ -30,6 +35,13 @@ router.get("/building/:id", async (req, res) => {
     const isFavorite = favoriteBuildings.some(
       (fav) => String((fav as any)._id) === String(buildingId),
     );
+
+    const userReview = sessionInfo?.user
+      ? await getReviewByUserAndBuilding(
+          new Types.ObjectId(sessionInfo.user.userId),
+          buildingId,
+        )
+      : null;
 
     const commentsWithReplies = [];
     let assoc_bldgs: any[] = [];
@@ -126,6 +138,7 @@ router.get("/building/:id", async (req, res) => {
       violationSummary,
       favorite_exists,
       isFavorite,
+      userReview,
       title:building.address,
     });
   } catch (e) {
@@ -149,13 +162,26 @@ router.post("/building/:id/review", async (req, res) => {
       });
     }
 
+    const reviewParse = AddReviewSchema.safeParse({
+      reviewText: xss(req.body.reviewText || "").trim(),
+      rating: xss(String(req.body.rating || "")).trim(),
+    });
+    if (!reviewParse.success) {
+      return res.status(400).render("error", {
+        title: "Error",
+        error: formatZodError(reviewParse.error),
+        backLink: `/building/${id}`,
+        backLinkText: "Return to building",
+      });
+    }
+
     const building = await getBuildingById(id);
     const buildingId = (building as any)._id;
 
     await addReview(
       buildingId,
-      xss(req.body.reviewText || "").trim(),
-      Number(xss(String(req.body.rating || "")).trim()),
+      reviewParse.data.reviewText,
+      reviewParse.data.rating,
       new Types.ObjectId(sessionInfo.user.userId),
     );
 
@@ -179,13 +205,21 @@ router.post("/building/:id/review/json", async (req, res) => {
       });
     }
 
+    const reviewParse = AddReviewSchema.safeParse({
+      reviewText: xss(req.body.reviewText || "").trim(),
+      rating: xss(String(req.body.rating || "")).trim(),
+    });
+    if (!reviewParse.success) {
+      return res.status(400).json({ error: formatZodError(reviewParse.error) });
+    }
+
     const building = await getBuildingById(id);
     const buildingId = (building as any)._id;
 
     await addReview(
       buildingId,
-      xss(req.body.reviewText || "").trim(),
-      Number(xss(String(req.body.rating || "")).trim()),
+      reviewParse.data.reviewText,
+      reviewParse.data.rating,
       new Types.ObjectId(sessionInfo.user.userId),
     );
 
@@ -214,12 +248,24 @@ router.post("/building/:id/comment", async (req, res) => {
       });
     }
 
+    const titleParse = TopicTitleFormSchema.safeParse({
+      topicTitle: xss(req.body.topicTitle || "").trim(),
+    });
+    if (!titleParse.success) {
+      return res.status(400).render("error", {
+        title: "Error",
+        error: formatZodError(titleParse.error),
+        backLink: `/building/${id}`,
+        backLinkText: "Return to building",
+      });
+    }
+
     const building = await getBuildingById(id);
     const buildingId = (building as any)._id;
 
     await addComment(
       buildingId,
-      xss(req.body.topicTitle || "").trim(),
+      titleParse.data.topicTitle,
       new Types.ObjectId(sessionInfo.user.userId),
     );
 
@@ -235,6 +281,9 @@ router.post("/building/:id/comment", async (req, res) => {
 //reply
 
 router.post("/topic/:id/reply", async (req, res) => {
+  const binParse = BinSchema.safeParse(xss(String(req.body.buildingBIN || "")).trim());
+  const safeBin = binParse.success ? binParse.data : null;
+
   try {
     const sessionInfo = req.session as any;
 
@@ -245,18 +294,47 @@ router.post("/topic/:id/reply", async (req, res) => {
       });
     }
 
+    if (!safeBin) {
+      return res.status(400).render("error", {
+        title: "Error",
+        error: "Invalid building reference.",
+      });
+    }
+
+    const topicIdParse = ObjectIdSchema.safeParse(xss(req.params.id || "").trim());
+    if (!topicIdParse.success) {
+      return res.status(400).render("error", {
+        title: "Error",
+        error: "Invalid topic id.",
+        backLink: `/building/${safeBin}?commentSubmitted=true`,
+        backLinkText: "Return to building",
+      });
+    }
+
+    const replyParse = ReplyFormSchema.safeParse({
+      replyText: xss(req.body.replyText || "").trim(),
+    });
+    if (!replyParse.success) {
+      return res.status(400).render("error", {
+        title: "Error",
+        error: formatZodError(replyParse.error),
+        backLink: `/building/${safeBin}?commentSubmitted=true`,
+        backLinkText: "Return to building",
+      });
+    }
+
     await addReply(
-      new Types.ObjectId(xss(req.params.id || "").trim()),
-      xss(req.body.replyText || "").trim(),
+      topicIdParse.data,
+      replyParse.data.replyText,
       new Types.ObjectId(sessionInfo.user.userId),
     );
 
-    res.redirect(`/building/${xss(req.body.buildingBIN || "").trim()}?commentSubmitted=true`);
+    res.redirect(`/building/${safeBin}?commentSubmitted=true`);
   } catch (e) {
     return res.status(400).render("error", {
       title: "Error",
       error: e,
-      backLink: `/building/${xss(req.body.buildingBIN || "").trim()}?commentSubmitted=true`,
+      backLink: safeBin ? `/building/${safeBin}?commentSubmitted=true` : "/",
       backLinkText: "Return to building",
     });
   }

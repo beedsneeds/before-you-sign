@@ -68,7 +68,7 @@ export const ingestViolations = async ({ collectNew = false }: { collectNew?: bo
   let failedCount = 0;
   const recordFailure = (entry: { violationid?: string | number; reason: string }) => {
     failedCount++;
-    console.error(`[ingest] ${entry.violationid ?? '?'}: ${entry.reason}`);
+    console.error(`[ingest is running] ${entry.violationid ?? '?'}: ${entry.reason}`);
   };
 
   const newViolations: ViolationDoc[] = [];
@@ -104,7 +104,7 @@ export const ingestViolations = async ({ collectNew = false }: { collectNew?: bo
     const boro = BORO_NAMES[data.boroId - 1];
 
     try {
-      // 0 = unregistered owner — treat as absent so we don't index a meaningless value
+      // 0 = unregistered owner. treat as absent so we don't index a meaningless value
       const regID = data.registrationId && data.registrationId > 0 ? data.registrationId : undefined;
 
       let building = await BuildingModel.findOne({ BIN: data.bin });
