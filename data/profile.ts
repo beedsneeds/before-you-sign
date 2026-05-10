@@ -1,10 +1,10 @@
-import * as z from 'zod';
-import bcrypt from 'bcrypt';
-import { Types } from 'mongoose';
-import { UserModel, UserInputSchema, NotifyMethod, type User } from './models/User.js';
-import { ReviewModel, type Review } from './models/Review.js';
-import { CommentModel, type Comment } from './models/Comment.js';
-import { formatZodError } from '../helpers/validation.js';
+import * as z from "zod";
+import bcrypt from "bcrypt";
+import { Types } from "mongoose";
+import { UserModel, UserInputSchema, NotifyMethod, type User } from "./models/User.js";
+import { ReviewModel, type Review } from "./models/Review.js";
+import { CommentModel, type Comment } from "./models/Comment.js";
+import { formatZodError } from "../helpers/validation.js";
 
 const NotificationPrefsSchema = z.array(NotifyMethod);
 
@@ -14,13 +14,31 @@ const ProfileUpdateSchema = UserInputSchema.pick({
   email: true,
 });
 
+const getDuplicateEmailError = (error: unknown, email: string) => {
+  if (error && typeof error === "object" && "code" in error && (error as any).code === 11000) {
+    return `Error: ${email} already exists.`;
+  }
+
+  if (
+    error &&
+    typeof error === "object" &&
+    "name" in error &&
+    (error as any).name === "MongoServerError" &&
+    (error as any).message?.includes("E11000")
+  ) {
+    return `Error: ${email} already exists.`;
+  }
+
+  return null;
+};
+
 const checkObjectId = (id: string): Types.ObjectId => {
-  if (!id || typeof id !== 'string') {
-    throw 'Error: User ID must be provided.';
+  if (!id || typeof id !== "string") {
+    throw "Error: User ID must be provided.";
   }
 
   if (!Types.ObjectId.isValid(id)) {
-    throw 'Error: Invalid user ID.';
+    throw "Error: Invalid user ID.";
   }
 
   return new Types.ObjectId(id);
@@ -29,24 +47,24 @@ const checkObjectId = (id: string): Types.ObjectId => {
 export const getUserProfileById = async (userId: string) => {
   const id = checkObjectId(userId);
 
-  const user = await UserModel.findById(id).populate('savedBuildings').exec();
+  const user = await UserModel.findById(id).populate("savedBuildings").exec();
   if (!user) {
-    throw 'Error: User not found.';
+    throw "Error: User not found.";
   }
 
   const savedBuildings = Array.isArray(user.savedBuildings)
     ? user.savedBuildings.map((building: any) =>
-        typeof building.toObject === 'function' ? building.toObject() : building,
+        typeof building.toObject === "function" ? building.toObject() : building,
       )
     : [];
 
   const reviews = await ReviewModel.find({ userId: id })
-    .populate('buildingId')
+    .populate("buildingId")
     .sort({ timeCreated: -1 })
     .exec();
 
   const comments = await CommentModel.find({ userId: id })
-    .populate('buildingId')
+    .populate("buildingId")
     .sort({ timeCreated: -1 })
     .exec();
 
@@ -74,24 +92,26 @@ export const updateUserProfile = async (
   const checkedEmail = parsed.data.email.toLowerCase();
 
   const existingUser = await UserModel.findOne({
-    email: checkedEmail,
+    emailLower: checkedEmail,
     _id: { $ne: id },
   });
 
   if (existingUser) {
-    throw 'An account with that email already exists.';
+    throw "Error: An account with that email already exists.";
   }
 
   const updateDoc: {
     firstName: string;
     lastName: string;
     email: string;
+    emailLower: string;
     hashedPassword?: string;
     notificationPrefs?: NotifyMethod[];
   } = {
     firstName: parsed.data.firstName,
     lastName: parsed.data.lastName,
-    email: checkedEmail,
+    email: parsed.data.email,
+    emailLower: checkedEmail,
   };
 
   if (password && password.trim().length > 0) {
@@ -108,12 +128,24 @@ export const updateUserProfile = async (
   }
 
   const updatedUser = await UserModel.findByIdAndUpdate(id, updateDoc, {
-    returnDocument: 'after',
+    returnDocument: "after",
   }).exec();
+  try {
+    const updatedUser = await UserModel.findByIdAndUpdate(id, updateDoc, {
+      new: true,
+    }).exec();
 
-  if (!updatedUser) {
-    throw 'Error: Could not update user profile.';
+    if (!updatedUser) {
+      throw "Error: Could not update user profile.";
+    }
+
+    return updatedUser.toObject() as User & { _id: Types.ObjectId };
+  } catch (error) {
+    const duplicateMessage = getDuplicateEmailError(error, parsed.data.email);
+    if (duplicateMessage) {
+      throw duplicateMessage;
+    }
+
+    throw error;
   }
-
-  return updatedUser.toObject() as User & { _id: Types.ObjectId };
 };

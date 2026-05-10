@@ -1,6 +1,7 @@
 import { Router } from "express";
 import xss from "xss";
 import { createUser, checkUser } from "../data/users.js";
+import { UserInputSchema } from "../data/models/User.js";
 
 const router = Router();
 
@@ -27,17 +28,32 @@ router
     const sessionInfo = req.session as any;
     const firstName = xss(req.body.firstName || "").trim();
     const lastName = xss(req.body.lastName || "").trim();
-    const email = xss(req.body.email || "")
-      .trim()
-      .toLowerCase();
+    const email = xss(req.body.email || "").trim();
     const password = req.body.password;
 
-    try {
-      const user = await createUser({
+    const parsed = UserInputSchema.safeParse({
+      firstName,
+      lastName,
+      email,
+      password,
+    });
+
+    if (!parsed.success) {
+      return res.status(400).render("register", {
+        title: "Register",
+        error: parsed.error.issues.map((issue) => issue.message).join("\n"),
         firstName,
         lastName,
         email,
-        password,
+      });
+    }
+
+    try {
+      const user = await createUser({
+        firstName: parsed.data.firstName,
+        lastName: parsed.data.lastName,
+        email: parsed.data.email,
+        password: parsed.data.password,
         isAdmin: false,
       });
 
@@ -76,10 +92,16 @@ router
   })
   .post(async (req, res) => {
     const sessionInfo = req.session as any;
-    const email = xss(req.body.email || "")
-      .trim()
-      .toLowerCase();
+    const email = xss(req.body.email || "").trim();
     const password = req.body.password;
+
+    if (!email || !password) {
+      return res.status(400).render("signin", {
+        title: "Sign In",
+        error: "Both email and password must be provided.",
+        email,
+      });
+    }
 
     try {
       const user = await checkUser(email, password);
