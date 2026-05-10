@@ -1,27 +1,27 @@
 <h1>{{#if isEditing}}Edit Profile{{else}}Register{{/if}}</h1>
 
 {{#if error}}
-  <p style='color: red;'>{{error}}</p>
+  <p class='error'>{{error}}</p>
 {{/if}}
 
 <form action='{{#if action}}{{action}}{{else}}/register{{/if}}' method='POST'>
   <label for='firstName'>First Name:</label>
-  <input type='text' name='firstName' id='firstName' value='{{firstName}}' required />
+  <input type='text' name='firstName' id='firstName' value='{{firstName}}' required >
 
-  <br />
+  <br >
 
   <label for='lastName'>Last Name:</label>
-  <input type='text' name='lastName' id='lastName' value='{{lastName}}' required />
+  <input type='text' name='lastName' id='lastName' value='{{lastName}}' required >
 
-  <br />
+  <br >
 
   <label for='email'>Email:</label>
-  <input type='email' name='email' id='email' value='{{email}}' required />
+  <input type='email' name='email' id='email' value='{{email}}' required >
 
-  <br />
+  <br >
 
   <label for='password'>Password:</label>
-  <input type='password' name='password' id='password' {{#unless isEditing}}required{{/unless}} />
+  <input type='password' name='password' id='password' {{#unless isEditing}}required{{/unless}} >
 
   {{#if isEditing}}
     <p class='message'>Leave this blank if you don't want to change it.</p>
@@ -29,17 +29,17 @@
     <fieldset>
       <legend>Notifications</legend>
       <label>
-        <input type='checkbox' name='notificationPrefs' value='email' {{#if prefEmail}}checked{{/if}} />
+        <input type='checkbox' name='notificationPrefs' value='email' {{#if prefEmail}}checked{{/if}} >
         Email
       </label>
       <label>
-        <input type='checkbox' name='notificationPrefs' value='inApp' {{#if prefInApp}}checked{{/if}} />
+        <input type='checkbox' name='notificationPrefs' value='inApp' {{#if prefInApp}}checked{{/if}} >
         In-app
       </label>
     </fieldset>
   {{/if}}
 
-  <br />
+  <br >
 
   {{#if isEditing}}
     <div style='display: inline-flex; gap: 10px; flex-wrap: wrap; align-items: center;'>

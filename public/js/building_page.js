@@ -143,3 +143,17 @@ if (commentForm) {
     }
   });
 }
+
+// reply validation
+const replyforms = document.querySelectorAll('.topic-content form');
+
+for (let i = 0; i < replyforms.length; i++) {
+  replyforms[i].addEventListener('submit', function (e) {
+    const textInReply = this.querySelector('[name="replyText"]').value.trim();
+
+    if (!textInReply || textInReply.length < 1) {
+      e.preventDefault();
+      alert('Reply cannot be empty.');
+    }
+  });
+}

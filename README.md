@@ -77,4 +77,4 @@ Then run:
 npx tsx data/cron/cron.ts
 ```
 
-To test the feature, search for BIN 1077517
+To test the feature, search for BIN 1005521. Use **Manhattan.2025-5-1.to.2026-5-1.zip** from the releases page.

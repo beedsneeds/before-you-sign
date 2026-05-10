@@ -39,9 +39,9 @@
         {{#each reviews}}
           <li>
             <span class="label">{{#if buildingId}}{{buildingId.address}}{{else}}Building{{/if}}</span>
-            {{#if buildingId}}(BIN: {{buildingId.BIN}}){{/if}}<br />
+            {{#if buildingId}}(BIN: {{buildingId.BIN}}){{/if}}<br >
             Rating:
-            {{rating}}<br />
+            {{rating}}<br >
             {{reviewText}}
           </li>
         {{/each}}
@@ -56,7 +56,7 @@
         {{#each comments}}
           <li>
             <span class="label">{{#if buildingId}}{{buildingId.address}}{{else}}Building{{/if}}</span>
-            {{#if buildingId}}(BIN: {{buildingId.BIN}}){{/if}}<br />
+            {{#if buildingId}}(BIN: {{buildingId.BIN}}){{/if}}<br >
             {{topicTitle}}
           </li>
         {{/each}}

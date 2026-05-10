@@ -126,6 +126,7 @@ router.get("/building/:id", async (req, res) => {
       violationSummary,
       favorite_exists,
       isFavorite,
+      title:building.address,
     });
   } catch (e) {
     res.status(404).render("error", { title: "Error", error: e });

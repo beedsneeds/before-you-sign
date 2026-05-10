@@ -54,7 +54,7 @@ const main = async () => {
       isAdmin: true,
       activityScore: 10,
       savedBuildings: [building1Id, building2Id],
-      notificationPrefs: ['email', 'inApp'],
+      notificationPrefs: ["email", "inApp"],
       reviewIds: [review1Id],
       commentIds: [topic2Id],
     },
@@ -67,7 +67,7 @@ const main = async () => {
       isAdmin: false,
       activityScore: 5,
       savedBuildings: [building2Id],
-      notificationPrefs: ['inApp'],
+      notificationPrefs: ["inApp"],
       reviewIds: [review2Id],
       commentIds: [topic1Id],
     },
@@ -76,9 +76,9 @@ const main = async () => {
       _id: zm_userId,
       firstName: "Zohran",
       lastName: "Mamdani",
-      email: "zohran@nyc.com",
-      hashedPassword: await hashPassword("zmpassword"),
-      isAdmin: false,
+      email: "mayor@zohranfornyc.com",
+      hashedPassword: await hashPassword("imthemayor"),
+      isAdmin: true,
 
       savedBuildings: [],
 
@@ -111,11 +111,11 @@ const main = async () => {
     },
 
     // BUILDING WITH LOTS OF ASSOCIATED BUILDINGS
-    // Associated Buildings tab population REQUIRES step 1 in data/cron/README.md (violations.csv)
+    //instructions in main README
     {
       _id: assocBuildId,
-      address: "300 Cherry Street, Manhattan, NY 10002",
-      BIN: 1077517,
+      address: "54 Rivington Street, Manhattan, NY 10002",
+      BIN: 1005521,
     },
   ]);
 
@@ -191,7 +191,7 @@ const main = async () => {
   ]);
 
   console.log(
-    "To test associated buildings, search BIN 1077517 (requires step 1 in data/cron/README.md)",
+    "To test associated buildings, search BIN 1005521 (requires NYC.2025-5-1.to.2026-5-1.zip from releases. Rename to violations.csv and place in data/cron/, see cron README)",
   );
 
   if (existsSync(CSV_PATH)) {
