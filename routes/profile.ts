@@ -81,7 +81,7 @@ router.post("/edit", requireLogin, async (req, res) => {
   const sessionInfo = req.session as any;
   const firstName = xss(req.body.firstName || "").trim();
   const lastName = xss(req.body.lastName || "").trim();
-  const email = xss(req.body.email || "").trim();
+  const email = xss(req.body.email || "").trim().toLowerCase();
   const password = req.body.password;
   const notificationPrefs = normalizePrefs(req.body.notificationPrefs);
 
