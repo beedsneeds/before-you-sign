@@ -3,13 +3,13 @@
 <div class='profile-grid'>
   <section class='profile-card profile-main-card'>
     <h2>User Information</h2>
-    <p><strong>Name:</strong> {{user.firstName}} {{user.lastName}}</p>
-    <p><strong>Email:</strong> {{user.email}}</p>
-    <p><strong>Admin status:</strong> {{#if user.isAdmin}}Yes{{else}}No{{/if}}</p>
-    <p><strong>Activity score:</strong> {{user.activityScore}}</p>
-    <p><strong>Saved buildings:</strong> {{savedBuildings.length}}</p>
-    <p><strong>Reviews:</strong> {{reviews.length}}</p>
-    <p><strong>Comments:</strong> {{comments.length}}</p>
+    <p><span class="label">Name:</span> {{user.firstName}} {{user.lastName}}</p>
+    <p><span class="label">Email:</span> {{user.email}}</p>
+    <p><span class="label">Admin status:</span> {{#if user.isAdmin}}Yes{{else}}No{{/if}}</p>
+    <p><span class="label">Activity score:</span> {{user.activityScore}}</p>
+    <p><span class="label">Saved buildings:</span> {{savedBuildings.length}}</p>
+    <p><span class="label">Reviews:</span> {{reviews.length}}</p>
+    <p><span class="label">Comments:</span> {{comments.length}}</p>
     <a class='button' href='/profile/edit'>Edit profile</a>
   </section>
 
@@ -38,7 +38,7 @@
       <ul>
         {{#each reviews}}
           <li>
-            <strong>{{#if buildingId}}{{buildingId.address}}{{else}}Building{{/if}}</strong>
+            <span class="label">{{#if buildingId}}{{buildingId.address}}{{else}}Building{{/if}}</span>
             {{#if buildingId}}(BIN: {{buildingId.BIN}}){{/if}}<br />
             Rating:
             {{rating}}<br />
@@ -55,9 +55,9 @@
       <ul>
         {{#each comments}}
           <li>
-            <strong>{{#if buildingId}}{{buildingId.address}}{{else}}Building{{/if}}</strong>
+            <span class="label">{{#if buildingId}}{{buildingId.address}}{{else}}Building{{/if}}</span>
             {{#if buildingId}}(BIN: {{buildingId.BIN}}){{/if}}<br />
-            {{commentText}}
+            {{topicTitle}}
           </li>
         {{/each}}
       </ul>

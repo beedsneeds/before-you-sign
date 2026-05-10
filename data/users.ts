@@ -1,6 +1,17 @@
+import { Types } from 'mongoose';
 import { UserModel, UserInputSchema } from './models/User.js';
 import bcrypt from 'bcrypt';
 import { formatZodError } from '../helpers/validation.js';
+
+export const KARMA_PER_SIGNIN = 1;
+export const KARMA_PER_CONTRIBUTION = 3;
+
+export const addKarma = async (userId: Types.ObjectId, amount: number) => {
+  if (!Number.isInteger(amount) || amount <= 0) {
+    throw new Error('Karma amount must be a positive integer');
+  }
+  await UserModel.findByIdAndUpdate(userId, { $inc: { activityScore: amount } });
+};
 
 export const createUser = async ({
   firstName,
@@ -64,9 +75,7 @@ export const checkUser = async (email: string, password: string) => {
   const passwordMatch = await bcrypt.compare(password, user.hashedPassword);
   if (!passwordMatch) throw 'Error: Either the email or password is invalid.';
 
-  await UserModel.findByIdAndUpdate(user._id, {
-    $inc: { activityScore: 1 },
-  });
+  await addKarma(user._id, KARMA_PER_SIGNIN);
 
   return {
     _id: user._id,

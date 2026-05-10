@@ -405,6 +405,19 @@ td:last-child {
   font-size: 0.8rem;
 }
 
+.label {
+  font-weight: bold;
+}
+
+.username {
+  font-weight: bold;
+}
+
+.note {
+  font-style: italic;
+  opacity: 0.75;
+}
+
 /* Forum style*/
 
 .topic-content {

@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 import { ViolationModel } from "./models/Violation.js";
-import { getBuildingById } from "./buildings.js";
+import { BuildingModel } from "./models/Building.js";
 
 //get violations for 1 building
 export const getViolationsByBuildingId = async (buildingId: Types.ObjectId) => {
@@ -67,34 +67,23 @@ export const calculateRatingByViolations = async (
   };
 };
 
-// violations assoc with registrationId
-export const getBuildingsByRegistrationId = async (registrationId: number) => {
-  const violations = await ViolationModel.find({
-    registrationId: registrationId,
-  });
+// Buildings sharing an HPD owner registration ID
+export const getBuildingsByRegID = async (regID: number) => {
+  if (!Number.isInteger(regID) || regID <= 0) return [];
 
-  // multiple vios possible but just need 1 id
-  const unique_bldg = [];
-  const seen_bldgs = new Set();
+  const buildings = await BuildingModel.find({ regID }).lean();
 
-  for (const violation of violations) {
-    if (!seen_bldgs.has(violation.bin)) {
-      seen_bldgs.add(violation.bin);
-
-      const building = await getBuildingById(String(violation.bin));
-
-      const safetyScore = await calculateRatingByViolations(violation.bin);
-
-      unique_bldg.push({
+  return Promise.all(
+    buildings.map(async (building) => {
+      const safetyScore = await calculateRatingByViolations(building.BIN);
+      return {
         address: building.address,
         BIN: building.BIN,
         avgRating: building.avgRating,
         reviewsCount: building.reviewsCount,
         safetyScore: safetyScore.rating,
         violationsCount: safetyScore.totalViolations,
-      });
-    }
-  }
-
-  return unique_bldg;
+      };
+    }),
+  );
 };
