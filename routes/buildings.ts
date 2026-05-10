@@ -182,7 +182,7 @@ router.post("/building/:id/comment", async (req, res) => {
     const building = await getBuildingById(id);
     const buildingId = (building as any)._id;
 
-    await addComment(buildingId, xss(req.body.topicTitle || "").trim());
+    await addComment(sessionInfo.user.userId, buildingId, xss(req.body.topicTitle || "").trim());
 
     res.redirect(`/building/${id}?commentSubmitted=true`);
   } catch (e) {
