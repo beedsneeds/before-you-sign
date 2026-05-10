@@ -1,16 +1,12 @@
 import { Types } from 'mongoose';
 import { ReplyModel, ReplyInputSchema, type Reply } from './models/Reply.js';
 
-export const getRepliesByTopicId = async (
-  topicId: Types.ObjectId
-): Promise<Reply[]> => {
-
+export const getRepliesByTopicId = async (topicId: Types.ObjectId): Promise<Reply[]> => {
   const replies = await ReplyModel.find({
     topicId: topicId
   }).populate('userId', 'firstName');
 
   return replies.map((reply: any) => reply.toObject());
-
 };
 
 export const addReply = async (
@@ -30,6 +26,4 @@ export const addReply = async (
   });
 
   return newReply;
-
 };
-

@@ -16,20 +16,38 @@ export const getReviewsByBuildingId = async (buildingId: Types.ObjectId): Promis
 
 //adding review and update the building stats
 export const addReview = async (
+  
+  //rahim
   buildingId: Types.ObjectId,
+ 
   reviewText: string,
+ 
   rating: number,
   userId: Types.ObjectId,
 ) => {
+  //rahim
+  if (!Types.ObjectId.isValid(userId)) throw new Error("Invalid user ID");
+
   const parsed = AddReviewSchema.safeParse({ reviewText, rating });
   if (!parsed.success) throw formatZodError(parsed.error);
-  const existingReview = await ReviewModel.findOne({ buildingId, userId });
-  if (existingReview) throw "You have already reviewed this building";
+
+  //rahim
+  //const userObjectId = new Types.ObjectId(userId);
+
+  const existingReview = await ReviewModel.findOne({
+    userId: userId,
+    buildingId,
+  });
+  if (existingReview) {
+    throw "You have already reviewd this building";
+  }
+  //
+
   const newReview = await ReviewModel.create({
     buildingId: buildingId,
     reviewText: parsed.data.reviewText,
     rating: parsed.data.rating,
-    userId: userId,
+    userId: new Types.ObjectId(),
     timeCreated: new Date(),
   });
 
