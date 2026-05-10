@@ -10,7 +10,7 @@ body {
 }
 
 .navbar {
-  background-color: #a9714b;
+  background-color: #7a5035;
   border-bottom: 4px solid #54442b;
   padding: 12px 24px;
   display: flex;
@@ -303,7 +303,7 @@ body.dark-mode #siteFooter {
 }
 .building-tabs button {
   background-color: #fff8ec;
-  color: #54442b;
+  color: #3d2e1a;
   border: 2px solid #54442b;
   padding: 10px 14px;
   border-radius: 8px;
@@ -469,7 +469,7 @@ body.dark-mode th a {
 }
 
 body.dark-mode .building-tabs button {
-  background-color: #a9714b;
+  background-color: #7a5035;
   color: #fff8ec;
   border-color: #e8985e;
 }

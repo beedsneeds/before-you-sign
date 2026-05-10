@@ -41,12 +41,12 @@
 
     {{#if isFavorite}}
       <form action="/favorites/{{building.BIN}}/remove" method="POST">
-        <input type="hidden" name="redirectTo" value="/building/{{building.BIN}}" />
+        <input type="hidden" name="redirectTo" value="/building/{{building.BIN}}" >
         <button type="submit">Unfavorite</button>
       </form>
     {{else}}
       <form action="/favorites/{{building.BIN}}" method="POST">
-        <input type="hidden" name="redirectTo" value="/building/{{building.BIN}}" />
+        <input type="hidden" name="redirectTo" value="/building/{{building.BIN}}" >
         <button type="submit">Save to Favorites</button>
       </form>
     {{/if}}
@@ -65,10 +65,10 @@
 
   <form method="POST" action="/building/{{building.BIN}}/review">
     <label for="reviewText">Review:</label>
-    <input type="text" id="reviewText" name="reviewText" placeholder="Please write a review" required />
+    <input type="text" id="reviewText" name="reviewText" placeholder="Please write a review" required >
 
     <label for="rating">Rating (1-5):</label>
-    <input type="number" id="rating" name="rating" min="1" max="5" required />
+    <input type="number" id="rating" name="rating" min="1" max="5" required >
 
     <button type="submit">Submit</button>
   </form>
@@ -149,7 +149,7 @@
         {{/if}}
 
         <form method="POST" action="/topic/{{this.comment._id}}/reply">
-          <input type="hidden" name="buildingBIN" value="{{@root.building.BIN}}" />
+          <input type="hidden" name="buildingBIN" value="{{@root.building.BIN}}" >
           <textarea name="replyText" placeholder="Write a reply" required></textarea>
           <button type="submit">Reply</button>
         </form>
@@ -161,7 +161,7 @@
 
   <form method="POST" action="/building/{{building.BIN}}/comment">
     <label for="topicTitle">Topic Title:</label>
-    <input type="text" id="topicTitle" name="topicTitle" placeholder="Please enter a topic title" required />
+    <input type="text" id="topicTitle" name="topicTitle" placeholder="Please enter a topic title" required >
     <button type="submit">Create Topic</button>
   </form>
 </section>
