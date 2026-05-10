@@ -317,6 +317,11 @@ body.dark-mode #siteFooter {
   display: none;
 }
 
+#building-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
 #overview {
   display: flex;
   flex-direction: column;

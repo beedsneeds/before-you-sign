@@ -14,11 +14,19 @@
   <button id="associated-tab">Associated Buildings</button>
 </div>
 
+
+
+<div id="building-header" class="building-subheader">
+  <span>{{building.address}}</span>
+  <span>BIN: {{building.BIN}}</span>
+</div>
+
+
 <section id="overview" class="building-section">
   <div class="overview-card">
     <h1>{{building.address}}</h1>
     <p>BIN: {{building.BIN}}</p>
-    <p>Avg Rating: {{building.avgRating}} ({{building.reviewsCount}} review/s)</p>
+    <p>Avg Rating: {{round building.avgRating}} ({{building.reviewsCount}} review/s)</p>
     <p>Violations Count: {{violations_count}}</p>
     <p>Building Safety Score: {{violationSummary.rating}} / 5</p>
     <p>Total Violations: {{violationSummary.totalViolations}}</p>
@@ -47,6 +55,7 @@
 
 <section id="reviews" class="building-section">
   <h2>Reviews</h2>
+    <h3>Average Rating: {{round building.avgRating}} ({{building.reviewsCount}} review/s)</h3>
 
   {{#each reviews}}
     {{> reviewscard}}
@@ -125,7 +134,7 @@
   {{#each comments}}
     <div class="forum-topic">
       <button class="topic-toggle">
-        {{this.comment.topicTitle}}
+        {{this.comment.topicTitle}} — {{this.comment.userId.firstName}}
       </button>
 
       <div class="topic-content">
@@ -133,7 +142,7 @@
 
         {{#if this.replies.length}}
           {{#each this.replies}}
-            <p>{{this.replyText}}</p>
+            <p>{{this.replyText}} — {{this.userId.firstName}}</p>
           {{/each}}
         {{else}}
           <p>No replies yet.</p>

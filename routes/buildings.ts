@@ -158,10 +158,10 @@ router.post("/building/:id/review", async (req, res) => {
     const buildingId = (building as any)._id;
 
     await addReview(
-      sessionInfo.user.userId,
       buildingId,
       xss(req.body.reviewText || "").trim(),
       Number(xss(String(req.body.rating || "")).trim()),
+      new Types.ObjectId(sessionInfo.user.userId),
     );
 
     res.redirect(`/building/${id}?reviewSubmitted=true`);
@@ -182,7 +182,7 @@ router.post("/building/:id/comment", async (req, res) => {
     if (!sessionInfo.user) {
       return res.status(403).render("error", {
         title: "Error",
-        error: "Please sign in to write a comment",
+        error: "Please sign in to start a topic",
         signInLink: "/signin",
         backLink: `/building/${id}`,
         backLinkText: "Return to building",
@@ -192,7 +192,11 @@ router.post("/building/:id/comment", async (req, res) => {
     const building = await getBuildingById(id);
     const buildingId = (building as any)._id;
 
-    await addComment(sessionInfo.user.userId, buildingId, xss(req.body.topicTitle || "").trim());
+    await addComment(
+      buildingId,
+      xss(req.body.topicTitle || "").trim(),
+      new Types.ObjectId(sessionInfo.user.userId),
+    );
 
     res.redirect(`/building/${id}?commentSubmitted=true`);
   } catch (e) {
@@ -217,9 +221,9 @@ router.post("/topic/:id/reply", async (req, res) => {
     }
 
     await addReply(
-      sessionInfo.user.userId,
       new Types.ObjectId(xss(req.params.id || "").trim()),
       xss(req.body.replyText || "").trim(),
+      new Types.ObjectId(sessionInfo.user.userId),
     );
 
     res.redirect(`/building/${xss(req.body.buildingBIN || "").trim()}?commentSubmitted=true`);

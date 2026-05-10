@@ -50,3 +50,20 @@ Strong Typechecking tips:
 
 Use the .js extension _only_ for import paths even if the actual file is a .ts
 We will not set allowImportingTsExtensions
+
+#### Testing
+
+## Testing Associated Buildings
+
+The Associated Buildings feature REQUIRES the violations dataset and cron ingestion setup.
+
+Before testing this feature, finish Step 1 and 2 in:
+`data/cron/README.md`
+
+Then run:
+
+```bash
+npx tsx data/cron/cron.ts
+```
+
+To test the feature, search for BIN 1077517
