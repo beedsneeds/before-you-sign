@@ -4,6 +4,7 @@ How to run the cron job and get notifications:
 Download, unzip and rename any [release](https://github.com/beedsneeds/before-you-sign/releases) to `violations.csv` and place it in `data/cron/`. Then run: `npx tsx data/cron/ingestViolations.ts`
 
 This ingests the existing CSV into the db without fetching from the API and without notifying any subscribers (so users don't get spammed on historical entries)
+The logs will be noisy if there are rejected rows with unaccepted schema (scale: about 88 fail out of 165k rows)
 
 #2
 Run `npx tsx data/cron/findNewBuildings.ts` to figure out which buildings will emit notifications during the next tick
