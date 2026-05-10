@@ -207,6 +207,7 @@ router.post("/topic/:id/reply", async (req, res) => {
     }
 
     await addReply(
+      sessionInfo.user.userId,
       new Types.ObjectId(xss(req.params.id || "").trim()),
       xss(req.body.replyText || "").trim(),
     );
