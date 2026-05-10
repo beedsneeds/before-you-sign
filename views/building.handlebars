@@ -142,7 +142,7 @@
 
         {{#if this.replies.length}}
           {{#each this.replies}}
-            <p>{{this.replyText}} — {{this.userId.firstName}}</p>
+            <p>{{this.replyText}} — <span class="username">{{this.userId.firstName}}</span> ({{this.userId.activityScore}} karma)</p>
           {{/each}}
         {{else}}
           <p>No replies yet.</p>
@@ -169,8 +169,8 @@
 <section id="associated" class="building-section">
   <h2>Associated Buildings</h2>
 
-  <p>Registration ID: {{registrationId}}</p>
-  <p>Buildings Found: {{assoc_bldgs.length}}</p>
+  <p><span class="label">Registration ID:</span> {{regID}}</p>
+  <p><span class="label">Buildings Found:</span> {{assoc_bldgs.length}}</p>
 
   <table>
     <tr>

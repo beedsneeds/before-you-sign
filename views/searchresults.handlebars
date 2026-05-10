@@ -7,7 +7,7 @@
 {{/if}}
 
 {{#if query}}
-  <p>Showing results for: <strong>{{query}}</strong></p>
+  <p>Showing results for: <span class="label">{{query}}</span></p>
 {{/if}}
 
 <hr />
@@ -20,10 +20,9 @@
 
         <h2>{{this.address}}</h2>
 
-        <p><strong>Borough:</strong> {{this.borough}}</p>
-        <p><strong>BIN:</strong> {{this.BIN}}</p>
+        <p><span class="label">BIN:</span> {{this.BIN}}</p>
 
-        <p><strong>Rating:</strong>
+        <p><span class="label">Rating:</span>
           {{#if this.avgRating}}
             {{this.avgRating}}
           {{else}}
@@ -31,7 +30,7 @@
           {{/if}}
         </p>
 
-        <p><strong>Reviews:</strong> {{this.reviewsCount}}</p>
+        <p><span class="label">Reviews:</span> {{this.reviewsCount}}</p>
 
         <a href='/building/{{this.BIN}}' class='view-btn'>
           View Building

@@ -1,7 +1,9 @@
 import mongoose, { Types } from "mongoose";
 import bcrypt from "bcrypt";
 import { connect, disconnect } from "../config/mongoConnection.js";
-import { startCron } from "../cron/cron.js";
+import { SEED_THRESHOLD } from "../cron/cron.js";
+import { findNewBuildings } from "../cron/findNewBuildings.js";
+import { ingestViolations } from "../cron/ingestViolations.js";
 import { UserModel } from "../models/User.js";
 import { BuildingModel } from "../models/Building.js";
 import { ReviewModel } from "../models/Review.js";
@@ -10,54 +12,16 @@ import { ReviewModel } from "../models/Review.js";
 import { CommentModel } from "../models/Comment.js";
 import { ReplyModel } from "../models/Reply.js";
 
-import { existsSync, promises as fsPromises } from "node:fs";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
-import readline from "node:readline/promises";
-import { stdin as input, stdout as output } from "node:process";
 
 const hashPassword = (password: string) => bcrypt.hash(password, 10);
 
-const CRON_DIR = join("data", "cron");
-const CSV_PATH = join(CRON_DIR, "violations.csv");
-const MINIMUM_RELEASE_ROWS = 5000;
-
-const countCsvRows = async (filePath: string): Promise<number> => {
-  const content = await fsPromises.readFile(filePath, "utf8");
-  if (!content.trim()) return 0;
-  return content.trim().split("\n").length - 1;
-};
-
-const prepareCsv = async (): Promise<boolean> => {
-  if (existsSync(CSV_PATH)) {
-    const rowCount = await countCsvRows(CSV_PATH);
-    if (rowCount >= MINIMUM_RELEASE_ROWS) {
-      console.log(
-        `Using existing violations.csv with ${rowCount} rows. Skipping cron and validation queries.`,
-      );
-      return false;
-    }
-
-    console.log(
-      `Found violations.csv with ${rowCount} rows, deleting it so the cron can recreate a fresh file.`,
-    );
-    await fsPromises.unlink(CSV_PATH);
-  }
-
-  return true;
-};
-
-const promptContinue = async (): Promise<boolean> => {
-  const rl = readline.createInterface({ input, output });
-  const answer = await rl.question("Continue cron job or terminate? (continue/terminate): ");
-  rl.close();
-  return answer.trim().toLowerCase().startsWith("c");
-};
+const CSV_PATH = join("data", "cron", "violations.csv");
 
 const main = async () => {
   await connect();
   await mongoose.connection.dropDatabase();
-
-  const needsCron = await prepareCsv();
 
   const adminId = new Types.ObjectId();
   const userId = new Types.ObjectId();
@@ -228,39 +192,20 @@ const main = async () => {
 
   console.log("To test associated buildings, search BIN 1077517 (requires step 1 in data/cron/README.md)");
 
-  if (!needsCron) {
-    console.log(
-      "Seeded users, buildings, reviews, and comments. CSV already exists, so no cron ticks were run.",
-    );
-    await disconnect();
-    return;
+  if (existsSync(CSV_PATH)) {
+    console.log(`Found ${CSV_PATH}; ingesting violations...`);
+    const { total } = await ingestViolations();
+    if (total < SEED_THRESHOLD) {
+      console.warn(
+        `violations.csv had only ${total} rows (< ${SEED_THRESHOLD}); cron will treat this as a cold start and not send out notifications. Retry this process with a larger dataset.`,
+      );
+    }
+
+    console.log("\nLooking up buildings with recent violations you can subscribe to...");
+    await findNewBuildings();
+  } else {
+    console.log(`No ${CSV_PATH} found; skipping violation ingest.`);
   }
-
-  console.log(
-    "A fresh violations.csv is required. Running first cron tick to pull the initial rows from the API...",
-  );
-  // TODO This is bugged
-  // await tick(false);
-
-  const firstContinue = await promptContinue();
-  if (!firstContinue) {
-    console.log("Seed complete; terminating after first tick.");
-    await disconnect();
-    return;
-  }
-
-  console.log("Running second cron tick to pull any newer rows...");
-  // await tick(false);
-
-  const secondContinue = await promptContinue();
-  if (!secondContinue) {
-    console.log("Seed complete; terminating after second tick.");
-    await disconnect();
-    return;
-  }
-
-  console.log("Continuing cron job...");
-  await startCron();
 
   await disconnect();
 };

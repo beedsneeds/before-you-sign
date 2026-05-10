@@ -9,7 +9,7 @@ const DEFAULT_INTERVAL_MS = 5 * 60 * 1000;
 // Simple heuristic to prevent notifications on the first fetch+ingest if db was not backfilled
 // If violation rows < 100k, treat as cold start and suppress the first tick's notifications
 // so we don't spam subscribers for historical rows
-const SEED_THRESHOLD = 100_000;
+export const SEED_THRESHOLD = 100_000;
 
 export const tick = async ({ notify = true }: { notify?: boolean } = {}) => {
   const start = Date.now();

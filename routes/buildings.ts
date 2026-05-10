@@ -6,7 +6,7 @@ import { getReviewsByBuildingId } from "../data/reviews.js";
 import { getCommentsByBuildingId } from "../data/comments.js";
 import { addComment } from "../data/comments.js";
 import { addReview } from "../data/reviews.js";
-import { getViolationsByBuildingId, getBuildingsByRegistrationId } from "../data/violations.js";
+import { getViolationsByBuildingId, getBuildingsByRegID } from "../data/violations.js";
 import { addReply } from "../data/replies.js";
 import { getFavBuildings } from "../data/favorites.js";
 import { Types } from "mongoose";
@@ -33,7 +33,7 @@ router.get("/building/:id", async (req, res) => {
 
     const commentsWithReplies = [];
     let assoc_bldgs: any[] = [];
-    let registrationId = null;
+    const regID = (building as any).regID ?? null;
 
     for (const comment of comments) {
       const replies = await getRepliesByTopicId((comment as any)._id);
@@ -43,14 +43,13 @@ router.get("/building/:id", async (req, res) => {
         replies: replies,
       });
     }
-    // grab registrationid if vio exists, first regid that there is
-    const violations = await getViolationsByBuildingId(buildingId);
-    if (violations.length > 0 && violations[0].registrationId) {
-      registrationId = violations[0].registrationId;
 
-      assoc_bldgs = await getBuildingsByRegistrationId(registrationId);
+    if (regID) {
+      assoc_bldgs = await getBuildingsByRegID(regID);
+      assoc_bldgs = assoc_bldgs.filter((b) => b.BIN !== building.BIN);
     }
-    assoc_bldgs = assoc_bldgs.filter((b) => b.BIN !== building.BIN);
+
+    const violations = await getViolationsByBuildingId(buildingId);
     //ratings based on the violations and a summary of what violations the building has(Rahim)
     // the data function is in data/violations.ts and is called calculateRatingByViolations(Rahim)
     const violationSummary = await calculateRatingByViolations(building.BIN);
@@ -117,7 +116,7 @@ router.get("/building/:id", async (req, res) => {
       violations,
       comments: commentsWithReplies,
       assoc_bldgs,
-      registrationId,
+      regID,
       violations_count: violations.length,
       vioClassCounts,
       vioSorted,
