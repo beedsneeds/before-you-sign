@@ -31,9 +31,17 @@
       <p class="error">This building has already been favorited by you.</p>
     {{/if}}
 
-    <form action="/favorites/{{building._id}}" method="POST">
-      <button type="submit">Save to Favorites</button>
-    </form>
+    {{#if isFavorite}}
+      <form action="/favorites/{{building._id}}/remove" method="POST">
+        <input type="hidden" name="redirectTo" value="/building/{{building.BIN}}" />
+        <button type="submit">Unfavorite</button>
+      </form>
+    {{else}}
+      <form action="/favorites/{{building._id}}" method="POST">
+        <input type="hidden" name="redirectTo" value="/building/{{building.BIN}}" />
+        <button type="submit">Save to Favorites</button>
+      </form>
+    {{/if}}
   </div>
 </section>
 
