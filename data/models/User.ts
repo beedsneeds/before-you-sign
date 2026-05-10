@@ -47,7 +47,7 @@ export type User = z.infer<typeof UserStoredSchema>;
 const UserDbSchema = new Schema<User>({
   firstName: { type: String, required: true, maxlength: 40 },
   lastName: { type: String, required: true, maxlength: 40 },
-  email: { type: String, required: true, trim: true },
+  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   hashedPassword: { type: String, required: true },
   isAdmin: { type: Boolean, required: true, default: false },
   activityScore: { type: Number, required: true, default: 0, min: 0 },

@@ -4,6 +4,7 @@ import { Types } from "mongoose";
 import { UserModel, UserInputSchema, NotifyMethod, type User } from "./models/User.js";
 import { ReviewModel, type Review } from "./models/Review.js";
 import { CommentModel, type Comment } from "./models/Comment.js";
+import { ReplyModel } from "./models/Reply.js";
 import { formatZodError } from "../helpers/validation.js";
 
 const NotificationPrefsSchema = z.array(NotifyMethod);
@@ -84,6 +85,12 @@ export const deleteUserById = async (userId: string) => {
     throw "Error: User not found.";
   }
 
+  await Promise.all([
+    ReviewModel.deleteMany({ userId: id }).exec(),
+    CommentModel.deleteMany({ userId: id }).exec(),
+    ReplyModel.deleteMany({ userId: id }).exec(),
+  ]);
+
   return deletedUser.toObject() as User & { _id: Types.ObjectId };
 };
 
@@ -136,9 +143,6 @@ export const updateUserProfile = async (
     updateDoc.notificationPrefs = parsedPrefs.data;
   }
 
-  const updatedUser = await UserModel.findByIdAndUpdate(id, updateDoc, {
-    returnDocument: "after",
-  }).exec();
   try {
     const updatedUser = await UserModel.findByIdAndUpdate(id, updateDoc, {
       new: true,
