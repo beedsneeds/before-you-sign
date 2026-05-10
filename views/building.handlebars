@@ -24,14 +24,14 @@
     <p>Total Violations: {{violationSummary.totalViolations}}</p>
 
     <p class="small-text">
-      *Based on building violations and severity levels. Higher scores indicate better safety.
+      *Score weighs how many violations the building has and how serious they are. 5 is best.
     </p>
 
     {{#if favorite_exists}}
       <p class="error">This building has already been favorited by you.</p>
     {{/if}}
 
-    <form action="/favorites/{{building._id}}" method="POST">
+    <form action="/favorites/{{building.BIN}}" method="POST">
       <button type="submit">Save to Favorites</button>
     </form>
   </div>
@@ -186,7 +186,7 @@
       {{/each}}
     {{else}}
       <tr>
-        <td colspan="5">No associated buildings were found.</td>
+        <td colspan="5">Couldn't find any other buildings that have the same landlord</td>
       </tr>
     {{/if}}
   </table>

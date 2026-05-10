@@ -132,7 +132,7 @@ router.post('/building/:id/review', async (req, res) => {
     if (!sessionInfo.user) {
       return res.status(403).render('error', {
         title: 'Error',
-        error: 'Please sign in to write a review',
+        error: 'You need to be signed in to leave a review.',
         signInLink: '/signin',
         backLink: `/building/${id}`,
       });
@@ -161,7 +161,7 @@ router.post('/building/:id/comment', async (req, res) => {
     if (!sessionInfo.user) {
       return res.status(403).render('error', {
         title: 'Error',
-        error: 'Please sign in to write a comment',
+        error: 'Sign in first to start a topic.',
         signInLink: '/signin',
         backLink: `/building/${id}`,
       });
@@ -190,7 +190,7 @@ router.post('/topic/:id/reply', async (req, res) => {
     if (!sessionInfo.user) {
       return res.status(403).render('error', {
         title: 'Error',
-        error: 'Please sign in to reply',
+        error: 'Sign in to reply.',
       });
     }
 

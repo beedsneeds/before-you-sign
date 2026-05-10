@@ -24,7 +24,19 @@
   <input type='password' name='password' id='password' {{#unless isEditing}}required{{/unless}} />
 
   {{#if isEditing}}
-    <p class='message'>Leave password blank to keep your current password.</p>
+    <p class='message'>Leave this blank if you don't want to change it.</p>
+
+    <fieldset>
+      <legend>Notifications</legend>
+      <label>
+        <input type='checkbox' name='notificationPrefs' value='email' {{#if prefEmail}}checked{{/if}} />
+        Email
+      </label>
+      <label>
+        <input type='checkbox' name='notificationPrefs' value='inApp' {{#if prefInApp}}checked{{/if}} />
+        In-app
+      </label>
+    </fieldset>
   {{/if}}
 
   <br />

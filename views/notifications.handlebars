@@ -1,0 +1,32 @@
+<h1>Notifications</h1>
+
+<p><a href='/profile/edit'>Adjust notification preferences</a></p>
+
+{{#if notifications.length}}
+  <form action='/notifications/clear' method='POST'>
+    <button type='submit'>Clear all</button>
+  </form>
+
+  <ul class='notifications-list'>
+    {{#each notifications}}
+      <li>
+        {{#if this.building}}
+          <a href='/building/{{this.building.BIN}}'>{{this.building.address}}</a>
+        {{else}}
+          <em>(this building was removed)</em>
+        {{/if}}
+
+        {{#if this.violation}}
+          <strong>Class {{this.violation.class}}</strong>:
+          {{this.violation.description}}
+          <em>({{this.violation.currentStatus}})</em>
+        {{/if}}
+
+        <br />
+        <small>{{this.createdAt}}</small>
+      </li>
+    {{/each}}
+  </ul>
+{{else}}
+  <p>No notifications yet. Favorite a building to get notified when new violations are filed.</p>
+{{/if}}

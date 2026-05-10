@@ -34,7 +34,8 @@ const main = async () => {
       hashedPassword: await hashPassword("superpassword"),
       isAdmin: true,
       activityScore: 10,
-      savedBuildings: [ building1Id ,  building2Id ], //joined notifications with saved buildings for simplicity
+      savedBuildings: [building1Id, building2Id],
+      notificationPrefs: ['email', 'inApp'],
       reviewIds: [review1Id],
       commentIds: [comment2Id],
     },
@@ -46,8 +47,8 @@ const main = async () => {
       hashedPassword: await hashPassword("normalpassword"),
       isAdmin: false,
       activityScore: 5,
-      notifications: [{ building2Id: true }], //separate field for notifications
       savedBuildings: [building2Id],
+      notificationPrefs: ['inApp'],
       reviewIds: [review2Id],
       commentIds: [comment1Id],
     },

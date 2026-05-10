@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import escapeStringRegexp from 'escape-string-regexp';
 import {
   BuildingInputSchema,
   BuildingStoredSchema,
@@ -83,7 +84,7 @@ export const updateBuildingById = async (
       avgRating: parsed.data.avgRating,
       reviewsCount: parsed.data.reviewsCount,
     },
-    { new: true },
+    { returnDocument: 'after' },
   );
 
   if (!updated) {
@@ -117,8 +118,7 @@ export const searchBuildings = async (searchTerm: string): Promise<Building[]> =
     throw 'Search term cannot be empty';
   }
 
-  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const addressRegex = new RegExp(escaped, 'i');
+  const addressRegex = new RegExp(escapeStringRegexp(term), 'i');
 
   const query = /^\d+$/.test(term)
     ? {

@@ -42,12 +42,12 @@ try {
     const buildings = await BuildingModel.find({ BIN: { $in: bins } });
 
     console.log(
-      `${buildings.length} known building(s) would receive new violations on next tick:\n`,
+      `Next tick would notify on ${buildings.length} building(s) already in the DB:\n`,
     );
     for (const b of buildings) {
       const n = newCountByBin.get(b.BIN) ?? 0;
       console.log(
-        `Building "${b.address}" with BIN ${b.BIN} has ${n} new violation${n === 1 ? '' : 's'}`,
+        `  ${b.address} (BIN ${b.BIN}): ${n} new violation${n === 1 ? '' : 's'}`,
       );
     }
 
@@ -55,7 +55,7 @@ try {
     const unknownCount = bins.filter((bin) => !known.has(bin)).length;
     if (unknownCount > 0) {
       console.log(
-        `\n(${unknownCount} BIN(s) aren't in your DB yet — they'd be created on the tick. Subscribe to one of the above instead.)`,
+        `\n(${unknownCount} more BIN(s) aren't in the DB yet. They'd get created on the tick, so favorite one of the above to actually see a notification.)`,
       );
     }
   }

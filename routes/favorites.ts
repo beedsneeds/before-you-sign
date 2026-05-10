@@ -27,7 +27,7 @@ router.get('/favorites', async (req, res) => {
 });
 
 //adding a building to favorites
-router.post('/favorites/:buildingId', async (req, res) => {
+router.post('/favorites/:bin', async (req, res) => {
   try {
     const user = (req.session as any).user;
 
@@ -35,8 +35,8 @@ router.post('/favorites/:buildingId', async (req, res) => {
       return res.redirect('/signin');
     }
 
-    const buildingId = req.params.buildingId;
-    const result = await addFavBuilding(user.userId, buildingId);
+    const bin = req.params.bin;
+    const result = await addFavBuilding(user.userId, bin);
 
     if (result.alreadyFavorited) {
       return res.redirect(req.get('Referrer') + '?favoriteExists=true');
@@ -52,7 +52,7 @@ router.post('/favorites/:buildingId', async (req, res) => {
 });
 
 //removing a building from favorites
-router.post('/favorites/:buildingId/remove', async (req, res) => {
+router.post('/favorites/:bin/remove', async (req, res) => {
   try {
     const user = (req.session as any).user;
 
@@ -60,9 +60,9 @@ router.post('/favorites/:buildingId/remove', async (req, res) => {
       return res.redirect('/signin');
     }
 
-    const buildingId = req.params.buildingId;
+    const bin = req.params.bin;
 
-    await removeFavBuilding(user.userId, buildingId);
+    await removeFavBuilding(user.userId, bin);
 
     return res.redirect('/favorites');
   } catch (e) {

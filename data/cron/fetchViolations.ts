@@ -10,10 +10,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = join(__dirname, 'violations.csv');
 
 export const fetchViolations = async () => {
-  // since: Fetch data that's been updated in the last 7 days
   const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 19);
 
   const url = new URL(API_ENDPOINT);
+  // Fetch violations that have been updated in the last 7 days
   url.searchParams.set('$where', `currentstatusdate > '${since}'`);
   url.searchParams.set('$limit', String(LIMIT));
 
@@ -23,7 +23,6 @@ export const fetchViolations = async () => {
   const csv = await res.text();
   await writeFile(OUT_PATH, csv);
 
-  // Log row count fetched: newline count minus the header row
   const rowCount = csv.trim() === '' ? 0 : csv.trim().split('\n').length - 1;
   console.log(
     `Wrote ${rowCount} rows to ${OUT_PATH} (currentstatusdate > ${since}, limit ${LIMIT})`,

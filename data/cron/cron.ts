@@ -3,6 +3,7 @@ import { connect, disconnect } from '../config/mongoConnection.js';
 import { ViolationModel } from '../models/Violation.js';
 import { fetchViolations } from './fetchViolations.js';
 import { ingestViolations } from './ingestViolations.js';
+import { notifySubscribers } from './notifySubscribers.js';
 
 const DEFAULT_INTERVAL_MS = 5 * 60 * 1000;
 // Simple heuristic to prevent notifications on the first fetch+ingest if db was not backfilled
@@ -10,19 +11,20 @@ const DEFAULT_INTERVAL_MS = 5 * 60 * 1000;
 // so we don't spam subscribers for historical rows
 const SEED_THRESHOLD = 100_000;
 
-// The first tick (T0) will ingest a violations.csv that already exists
-// This is to backfill data until a point where the cron job can begin its work
-// Ticks after that T1+ will fetch and overwrite violations.csv and once again ingest new csv
-export const tick = async (skipFetch: boolean) => {
-  const label = skipFetch ? 'seed tick (ingest only)' : 'cron tick';
+export const tick = async ({ notify = true }: { notify?: boolean } = {}) => {
   const start = Date.now();
-  console.log(`[cron] ${label} at ${new Date().toISOString()}`);
+  console.log(`[cron] tick at ${new Date().toISOString()}${notify ? '' : ' (notifications suppressed)'}`);
   try {
     await fetchViolations();
+    const { newViolations } = await ingestViolations({ collectNew: notify });
+    if (notify && newViolations.length > 0) {
+      console.log(`[cron] ${newViolations.length} new violation(s) to notify on`);
+      await notifySubscribers(newViolations);
+    }
     console.log(`[cron] tick done in ${((Date.now() - start) / 1000).toFixed(1)}s`);
   } catch (err) {
-    // Log and continue — a single tick failure shouldn't kill the schedule.
-    console.error(`[cron] ${label} failed:`, err instanceof Error ? err.message : err);
+    // Single tick failure shouldn't kill the process
+    console.error('[cron] tick failed:', err instanceof Error ? err.message : err);
   }
 };
 
@@ -30,6 +32,12 @@ export const tick = async (skipFetch: boolean) => {
 // First tick suppresses notifications only if the DB doesn't look seeded (check SEED_THRESHOLD)
 export const startCron = async (intervalMs = DEFAULT_INTERVAL_MS) => {
   const violationCount = await ViolationModel.estimatedDocumentCount();
+  const isSeeded = violationCount >= SEED_THRESHOLD;
+  if (!isSeeded) {
+    console.log(
+      `[cron] DB has ${violationCount} violations (< ${SEED_THRESHOLD}); treating as cold start, first-tick notifications suppressed`,
+    );
+  }
   let firstTick = true;
   while (true) {
     await tick({ notify: isSeeded || !firstTick });

@@ -8,7 +8,7 @@ const dateFromApi = z.coerce.date();
 // for rentimpairing
 const yesNoFromApi = z.enum(['Y', 'N']).transform((v) => v === 'Y');
 
-const BOROS = ['MANHATTAN', 'BRONX', 'BROOKLYN', 'QUEENS', 'STATEN ISLAND'] as const;
+const BOROS = ['MANHATTAN', 'BRONX', 'BROOKLYN', 'QUEENS', 'STATEN ISLAND'];
 
 export const ViolationInputSchema = z.object({
   violationId: z.coerce.number().int().positive(),
@@ -61,7 +61,7 @@ export const ViolationInputSchema = z.object({
 
 export const ViolationStoredSchema = ViolationInputSchema.omit({ boroId: true }).extend({
   buildingId: z.instanceof(Types.ObjectId),
-  boro: z.enum(BOROS),
+  boro: z.enum(['MANHATTAN', 'BRONX', 'BROOKLYN', 'QUEENS', 'STATEN ISLAND']),
 });
 
 export type Violation = z.infer<typeof ViolationStoredSchema>;
