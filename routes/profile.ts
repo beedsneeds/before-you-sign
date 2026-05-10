@@ -1,7 +1,7 @@
 import xss from "xss";
 import { Router, type Request, type Response, type NextFunction } from "express";
 import { UserInputSchema } from "../data/models/User.js";
-import { getUserProfileById, updateUserProfile } from "../data/profile.js";
+import { getUserProfileById, updateUserProfile, deleteUserById } from "../data/profile.js";
 import { formatZodError } from "../helpers/validation.js";
 
 const router = Router();
@@ -132,6 +132,24 @@ router.post("/edit", requireLogin, async (req, res) => {
       email,
       prefEmail: notificationPrefs.includes('email'),
       prefInApp: notificationPrefs.includes('inApp'),
+    });
+  }
+});
+
+router.post("/delete", requireLogin, async (req, res) => {
+  const sessionInfo = req.session as any;
+
+  try {
+    await deleteUserById(sessionInfo.user.userId);
+    req.session.destroy(() => {
+      res.redirect("/signin");
+    });
+  } catch (e) {
+    return res.status(400).render("error", {
+      title: "Error",
+      error: e,
+      backLink: "/profile",
+      backLinkText: "Return to profile",
     });
   }
 });

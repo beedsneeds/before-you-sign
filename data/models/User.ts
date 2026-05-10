@@ -57,8 +57,6 @@ const UserDbSchema = new Schema<User>({
   commentIds: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
 });
 
-// UserDbSchema.index({ emailLower: 1 }, { unique: false });
-
 export const UserModel = model<User>("User", UserDbSchema);
 export type UserDoc = HydratedDocument<User>;
 

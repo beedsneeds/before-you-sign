@@ -76,6 +76,17 @@ export const getUserProfileById = async (userId: string) => {
   };
 };
 
+export const deleteUserById = async (userId: string) => {
+  const id = checkObjectId(userId);
+
+  const deletedUser = await UserModel.findByIdAndDelete(id).exec();
+  if (!deletedUser) {
+    throw "Error: User not found.";
+  }
+
+  return deletedUser.toObject() as User & { _id: Types.ObjectId };
+};
+
 export const updateUserProfile = async (
   userId: string,
   firstName: string,
@@ -89,10 +100,10 @@ export const updateUserProfile = async (
   const parsed = ProfileUpdateSchema.safeParse({ firstName, lastName, email });
   if (!parsed.success) throw formatZodError(parsed.error);
 
-  const checkedEmail = parsed.data.email.toLowerCase();
+  const emailPattern = `^${parsed.data.email.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`;
 
   const existingUser = await UserModel.findOne({
-    emailLower: checkedEmail,
+    email: { $regex: emailPattern, $options: "i" },
     _id: { $ne: id },
   });
 
@@ -104,14 +115,12 @@ export const updateUserProfile = async (
     firstName: string;
     lastName: string;
     email: string;
-    emailLower: string;
     hashedPassword?: string;
     notificationPrefs?: NotifyMethod[];
   } = {
     firstName: parsed.data.firstName,
     lastName: parsed.data.lastName,
     email: parsed.data.email,
-    emailLower: checkedEmail,
   };
 
   if (password && password.trim().length > 0) {

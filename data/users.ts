@@ -3,10 +3,11 @@ import bcrypt from "bcrypt";
 import { formatZodError } from "../helpers/validation.js";
 import { Types } from "mongoose";
 
-const toLowerEmail = (email: string) => email.trim().toLowerCase();
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const findUserByEmail = async (email: string) => {
-  return UserModel.findOne({ emailLower: toLowerEmail(email) }).exec();
+  const emailPattern = `^${escapeRegExp(email.trim())}$`;
+  return UserModel.findOne({ email: { $regex: emailPattern, $options: "i" } }).exec();
 };
 
 const getDuplicateEmailError = (error: unknown, email: string) => {
@@ -53,8 +54,6 @@ export const createUser = async ({
   const parsed = UserInputSchema.safeParse({ firstName, lastName, email, password });
   if (!parsed.success) throw formatZodError(parsed.error);
 
-  const checkedEmail = toLowerEmail(parsed.data.email);
-
   const existing = await findUserByEmail(parsed.data.email);
   if (existing) throw "Error: An account with that email already exists.";
 
@@ -64,7 +63,6 @@ export const createUser = async ({
     firstName: parsed.data.firstName,
     lastName: parsed.data.lastName,
     email: parsed.data.email,
-    emailLower: checkedEmail,
     hashedPassword,
     isAdmin: false,
     activityScore: 0,

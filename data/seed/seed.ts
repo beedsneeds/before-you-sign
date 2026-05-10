@@ -190,7 +190,9 @@ const main = async () => {
     },
   ]);
 
-  console.log("To test associated buildings, search BIN 1077517 (requires step 1 in data/cron/README.md)");
+  console.log(
+    "To test associated buildings, search BIN 1077517 (requires step 1 in data/cron/README.md)",
+  );
 
   if (existsSync(CSV_PATH)) {
     console.log(`Found ${CSV_PATH}; ingesting violations...`);
