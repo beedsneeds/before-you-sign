@@ -8,6 +8,7 @@ import { addComment } from "../data/comments.js";
 import { addReview } from "../data/reviews.js";
 import { getViolationsByBuildingId, getBuildingsByRegistrationId } from "../data/violations.js";
 import { addReply } from "../data/replies.js";
+import { getFavBuildings } from "../data/favorites.js";
 import { Types } from "mongoose";
 import { getRepliesByTopicId } from "../data/replies.js";
 
@@ -21,6 +22,14 @@ router.get("/building/:id", async (req, res) => {
     const buildingId = (building as any)._id;
     const reviews = await getReviewsByBuildingId(buildingId);
     const comments = await getCommentsByBuildingId(buildingId);
+
+    const sessionInfo = req.session as any;
+    const favoriteBuildings = sessionInfo?.user
+      ? await getFavBuildings(sessionInfo.user.userId)
+      : [];
+    const isFavorite = favoriteBuildings.some(
+      (fav) => String((fav as any)._id) === String(buildingId),
+    );
 
     const commentsWithReplies = [];
     let assoc_bldgs: any[] = [];
@@ -122,6 +131,7 @@ router.get("/building/:id", async (req, res) => {
       //just added this but you still need to diplay it in handlebars, i didn't tuch that(Rahim)
       violationSummary,
       favorite_exists,
+      isFavorite,
     });
   } catch (e) {
     res.status(404).render("error", { title: "Error", error: e });
