@@ -1,26 +1,24 @@
-<nav class='navbar'>
-  <a class='nav-logo-link' href='/'>
-    <img src='/public/images/logo.png' alt='Before You Sign logo' class='nav-logo' />
+<nav class="navbar">
+  <a class="nav-logo-link" href="/">
+    <img src="/public/images/logo.png" alt="Before You Sign logo" class="nav-logo" >
     <span>Home</span>
   </a>
 
-  <button id='darkModeToggle' class='dark-toggle' type='button'>
-    Dark Mode
-  </button>
+  <button id="darkModeToggle" class="dark-toggle" type="button">Dark Mode</button>
 
-  <div class='nav-links'>
+  <div class="nav-links">
     {{#if loggedIn}}
-      <a id='profile' href='/profile'>Profile</a>
-      <a id='notifications' href='/notifications'>Notifications</a>
+    <a id="profile" href="/profile">Profile</a>
+    <a id="notifications" href="/notifications">Notifications</a>
 
-      {{#if isAdmin}}
-        <a id='adminDashboard' href='/admin'>Admin Dashboard</a>
-      {{/if}}
+    {{#if isAdmin}}
+    <a id="adminDashboard" href="/admin">Admin Dashboard</a>
+    {{/if}}
 
-      <a id='signOut' href='/signout'>Sign Out</a>
+    <a id="signOut" href="/signout">Sign Out</a>
     {{else}}
-      <a id='signUp' href='/register'>Register</a>
-      <a id='signIn' href='/signin'>Sign In</a>
+    <a id="signUp" href="/register">Register</a>
+    <a id="signIn" href="/signin">Sign In</a>
     {{/if}}
   </div>
 </nav>
