@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 import { CommentModel, CommentInputSchema, type Comment } from './models/Comment.js';
 
 export const getCommentsByBuildingId = async (buildingId: Types.ObjectId): Promise<Comment[]> => {
-  const comments = await CommentModel.find({ buildingId: buildingId });
+  const comments = await CommentModel.find({ buildingId: buildingId }).populate('userId', 'firstName');
   return comments.map((comment: any) => comment.toObject());
 };
 

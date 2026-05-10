@@ -151,7 +151,7 @@ router.post("/building/:id/review", async (req, res) => {
       buildingId,
       xss(req.body.reviewText || "").trim(),
       Number(xss(String(req.body.rating || "")).trim()),
-      new Types.ObjectId(sessionInfo.user._id),
+      new Types.ObjectId(sessionInfo.user.userId),
     );
 
     res.redirect(`/building/${id}?reviewSubmitted=true`);
@@ -185,7 +185,7 @@ router.post("/building/:id/comment", async (req, res) => {
     await addComment(
       buildingId,
       xss(req.body.topicTitle || "").trim(),
-      new Types.ObjectId(sessionInfo.user._id),
+      new Types.ObjectId(sessionInfo.user.userId),
     );
 
     res.redirect(`/building/${id}?commentSubmitted=true`);
@@ -213,7 +213,7 @@ router.post("/topic/:id/reply", async (req, res) => {
     await addReply(
       new Types.ObjectId(xss(req.params.id || "").trim()),
       xss(req.body.replyText || "").trim(),
-      new Types.ObjectId(sessionInfo.user._id),
+      new Types.ObjectId(sessionInfo.user.userId),
     );
 
     res.redirect(`/building/${xss(req.body.buildingBIN || "").trim()}?commentSubmitted=true`);

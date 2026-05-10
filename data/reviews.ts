@@ -10,7 +10,7 @@ const AddReviewSchema = ReviewInputSchema.pick({ rating: true }).extend({
 });
 
 export const getReviewsByBuildingId = async (buildingId: Types.ObjectId): Promise<Review[]> => {
-  const reviews = await ReviewModel.find({ buildingId: buildingId });
+  const reviews = await ReviewModel.find({ buildingId: buildingId }).populate('userId', 'firstName');
   return reviews.map((review) => review.toObject());
 };
 

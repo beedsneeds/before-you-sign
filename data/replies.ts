@@ -7,7 +7,7 @@ export const getRepliesByTopicId = async (
 
   const replies = await ReplyModel.find({
     topicId: topicId
-  });
+  }).populate('userId', 'firstName');
 
   return replies.map((reply: any) => reply.toObject());
 

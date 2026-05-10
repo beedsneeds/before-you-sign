@@ -65,10 +65,17 @@ for (let i = 0; i < topicButtons.length; i++) {
   });
 }
 
+// stay on overview after submit
 if (window.location.search.includes('commentSubmitted=true')) {
   hideAllSections();
 
   commentsSection.style.display = 'block';
+}
+
+if (window.location.search.includes('reviewSubmitted=true')) {
+  hideAllSections();
+
+  reviewsSection.style.display = 'block';
 }
 
 
