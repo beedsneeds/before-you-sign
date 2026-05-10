@@ -17,11 +17,13 @@ export async function sendEmail(opts: { to: string; subject: string; html: strin
   return data;
 }
 
+// Stub to test if emails work, adjust email
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   console.log('email sent');
   try {
     const data = await sendEmail({
       to: 'rviwt2018@gmail.com',
+      // to: 'YOUR.EMAIL@example.com',
       subject: `Test ${new Date().toISOString()}`,
       html: `<p>Test send at ${new Date().toISOString()}</p>`,
     });

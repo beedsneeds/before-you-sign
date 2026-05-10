@@ -1,7 +1,7 @@
 import mongoose, { Types } from "mongoose";
 import bcrypt from "bcrypt";
 import { connect, disconnect } from "../config/mongoConnection.js";
-import { tick, startCron } from "../cron/cron.js";
+import { startCron } from "../cron/cron.js";
 import { UserModel } from "../models/User.js";
 import { BuildingModel } from "../models/Building.js";
 import { ReviewModel } from "../models/Review.js";
@@ -89,7 +89,8 @@ const main = async () => {
       hashedPassword: await hashPassword("superpassword"),
       isAdmin: true,
       activityScore: 10,
-      savedBuildings: [building1Id, building2Id], //joined notifications with saved buildings for simplicity
+      savedBuildings: [building1Id, building2Id],
+      notificationPrefs: ['email', 'inApp'],
       reviewIds: [review1Id],
       commentIds: [topic2Id],
     },
@@ -101,8 +102,8 @@ const main = async () => {
       hashedPassword: await hashPassword("normalpassword"),
       isAdmin: false,
       activityScore: 5,
-      notifications: [{ building2Id: true }], //separate field for notifications
       savedBuildings: [building2Id],
+      notificationPrefs: ['inApp'],
       reviewIds: [review2Id],
       commentIds: [topic1Id],
     },
@@ -238,7 +239,8 @@ const main = async () => {
   console.log(
     "A fresh violations.csv is required. Running first cron tick to pull the initial rows from the API...",
   );
-  await tick(false);
+  // TODO This is bugged
+  // await tick(false);
 
   const firstContinue = await promptContinue();
   if (!firstContinue) {
@@ -248,7 +250,7 @@ const main = async () => {
   }
 
   console.log("Running second cron tick to pull any newer rows...");
-  await tick(false);
+  // await tick(false);
 
   const secondContinue = await promptContinue();
   if (!secondContinue) {

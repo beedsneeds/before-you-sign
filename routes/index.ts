@@ -5,6 +5,7 @@ import buildingRoutes from "./buildings.js";
 import searchRoutes from "./search.js";
 import favoritesRoutes from "./favorites.js";
 import profileRoutes from "./profile.js";
+import notificationsRoutes from "./notifications.js";
 
 const router = Router();
 
@@ -16,6 +17,7 @@ const constructorMethod = (app: Express) => {
   app.use("/", buildingRoutes);
   app.use("/", favoritesRoutes);
   app.use("/profile", profileRoutes);
+  app.use("/notifications", notificationsRoutes);
 
   // mount router (needed for building route to work)
   app.use("/", router);

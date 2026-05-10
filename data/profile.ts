@@ -1,9 +1,12 @@
+import * as z from 'zod';
 import bcrypt from 'bcrypt';
 import { Types } from 'mongoose';
-import { UserModel, UserInputSchema, type User } from './models/User.js';
+import { UserModel, UserInputSchema, NotifyMethod, type User } from './models/User.js';
 import { ReviewModel, type Review } from './models/Review.js';
 import { CommentModel, type Comment } from './models/Comment.js';
 import { formatZodError } from '../helpers/validation.js';
+
+const NotificationPrefsSchema = z.array(NotifyMethod);
 
 const ProfileUpdateSchema = UserInputSchema.pick({
   firstName: true,
@@ -61,6 +64,7 @@ export const updateUserProfile = async (
   lastName: string,
   email: string,
   password?: string,
+  notificationPrefs?: unknown,
 ) => {
   const id = checkObjectId(userId);
 
@@ -75,14 +79,20 @@ export const updateUserProfile = async (
   });
 
   if (existingUser) {
-    throw 'Error: An account with that email already exists.';
+    throw 'An account with that email already exists.';
   }
 
-  const updateDoc: Partial<User> = {
+  const updateDoc: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    hashedPassword?: string;
+    notificationPrefs?: NotifyMethod[];
+  } = {
     firstName: parsed.data.firstName,
     lastName: parsed.data.lastName,
     email: checkedEmail,
-  } as Partial<User>;
+  };
 
   if (password && password.trim().length > 0) {
     const parsedPassword = UserInputSchema.shape.password.safeParse(password);
@@ -91,8 +101,14 @@ export const updateUserProfile = async (
     updateDoc.hashedPassword = await bcrypt.hash(parsedPassword.data, 12);
   }
 
+  if (notificationPrefs !== undefined) {
+    const parsedPrefs = NotificationPrefsSchema.safeParse(notificationPrefs);
+    if (!parsedPrefs.success) throw formatZodError(parsedPrefs.error);
+    updateDoc.notificationPrefs = parsedPrefs.data;
+  }
+
   const updatedUser = await UserModel.findByIdAndUpdate(id, updateDoc, {
-    new: true,
+    returnDocument: 'after',
   }).exec();
 
   if (!updatedUser) {

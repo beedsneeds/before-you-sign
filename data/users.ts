@@ -22,7 +22,7 @@ export const createUser = async ({
 
   const existing = await UserModel.findOne({ email: checkedEmail });
 
-  if (existing) throw 'Error: An account with that email already exists.';
+  if (existing) throw 'An account with that email already exists.';
 
   const hashedPassword = await bcrypt.hash(parsed.data.password, 12);
 
@@ -52,7 +52,7 @@ export const createUser = async ({
 
 export const checkUser = async (email: string, password: string) => {
   if (!email || !password) {
-    throw 'Error: Both email and password must be provided.';
+    throw 'Enter both an email and a password.';
   }
 
   const checkedEmail = email.trim().toLowerCase();

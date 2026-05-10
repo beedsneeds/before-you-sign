@@ -8,14 +8,14 @@
           {{this.address}}
         </a>
 
-        <form action='/favorites/{{this._id}}/remove' method='POST'>
+        <form action='/favorites/{{this.BIN}}/remove' method='POST'>
           <button type='submit'>Remove</button>
         </form>
       </li>
     {{/each}}
   </ul>
 {{else}}
-  <p>You do not have any favorited buildings at the moment.</p>
+  <p>You haven't saved any buildings yet.</p>
 {{/if}}
 
 <a href='/' class='back-link'>Back to Search</a>

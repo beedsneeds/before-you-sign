@@ -1,11 +1,13 @@
 How to run the cron job:
 
-#1
-download, unzip and rename any [release](https://github.com/beedsneeds/before-you-sign/releases) on our github to violations.csv. Place it in data/cron
+#1 (Optional, but necessary for generating notifications) Backfill violation history from a release
+Download, unzip and rename any [release](https://github.com/beedsneeds/before-you-sign/releases) to `violations.csv` and place it in `data/cron/`. Then run: `npx tsx data/cron/ingestViolations.ts`
 
-#2
-Run `npx tsx data/cron/cron.ts`
-If you ran the optional step above, the db should be populated with 1000's of violations immediately. If not, it will be populated with <=50k violations after 60s
+This ingests the existing CSV into the db without fetching from the API and without notifying any subscribers (so users don't get spammed on historical entries)
+
+#2 Start the cron
+Run `npx tsx data/cron/cron.ts`. It will fetch from the API, ingest, and notify subscribers of any new violations on each tick (every 5 min)
+If you ran the optional step above, the db should be populated with 100_000's of violations immediately. If not, it will be populated with ~50k violations after 60s (with no notifications delivered)
 
 Troubleshoot:
 If anything breaks, try `npx tsx data/cron/fetchViolations.ts` and then `npx tsx data/cron/ingestViolations.ts`. Tell me what went wrong

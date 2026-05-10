@@ -36,6 +36,14 @@ router.get("/", requireLogin, async (req, res) => {
   }
 });
 
+// form-urlencoded returns checkbox groups as: undefined (none) | string (one) | string[] (multi)
+const normalizePrefs = (raw: unknown): string[] => {
+  if (raw === undefined) return [];
+  if (typeof raw === "string") return [raw];
+  if (Array.isArray(raw)) return raw;
+  return [];
+};
+
 router.get("/edit", requireLogin, async (req, res) => {
   try {
     const sessionInfo = req.session as any;
@@ -48,6 +56,8 @@ router.get("/edit", requireLogin, async (req, res) => {
       firstName: profile.user.firstName,
       lastName: profile.user.lastName,
       email: profile.user.email,
+      prefEmail: profile.user.notificationPrefs.includes('email'),
+      prefInApp: profile.user.notificationPrefs.includes('inApp'),
     });
   } catch (e) {
     return res.status(400).render("error", {
@@ -67,6 +77,7 @@ router.post("/edit", requireLogin, async (req, res) => {
     .trim()
     .toLowerCase();
   const password = req.body.password;
+  const notificationPrefs = normalizePrefs(req.body.notificationPrefs);
 
   try {
     const updatedUser = await updateUserProfile(
@@ -75,6 +86,7 @@ router.post("/edit", requireLogin, async (req, res) => {
       lastName,
       email,
       password,
+      notificationPrefs,
     );
 
     sessionInfo.user = {
@@ -95,6 +107,8 @@ router.post("/edit", requireLogin, async (req, res) => {
       firstName,
       lastName,
       email,
+      prefEmail: notificationPrefs.includes('email'),
+      prefInApp: notificationPrefs.includes('inApp'),
     });
   }
 });
