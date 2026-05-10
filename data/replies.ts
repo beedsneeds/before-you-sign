@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 import { ReplyModel, ReplyInputSchema, type Reply } from './models/Reply.js';
 import { addKarma, KARMA_PER_CONTRIBUTION } from './users.js';
+import { formatZodError } from '../helpers/validation.js';
 
 export const getRepliesByTopicId = async (topicId: Types.ObjectId): Promise<Reply[]> => {
   const replies = await ReplyModel.find({
@@ -17,7 +18,7 @@ export const addReply = async (
 ) => {
 
   const parsed=ReplyInputSchema.safeParse ({topicId, replyText})
-  if (!parsed.success) throw parsed.error.flatten()
+  if (!parsed.success) throw formatZodError(parsed.error);
 
   const newReply = await ReplyModel.create({
     topicId: topicId,

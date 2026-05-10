@@ -4,6 +4,13 @@ import { addFavBuilding, removeFavBuilding, getFavBuildings } from "../data/favo
 
 const router = Router();
 
+const safeRedirect = (raw: unknown, fallback = "/favorites"): string => {
+  const value = typeof raw === "string" ? xss(raw).trim() : "";
+  if (!value.startsWith("/")) return fallback;
+  if (value.startsWith("//") || value.startsWith("/\\")) return fallback;
+  return value;
+};
+
 //viewing the favorites page
 router.get("/favorites", async (req, res) => {
   try {
@@ -37,9 +44,7 @@ router.post("/favorites/:buildingId", async (req, res) => {
     }
 
     const buildingId = xss(req.params.buildingId || "").trim();
-    const redirectTo = xss(
-      String(req.body.redirectTo || req.get("Referrer") || "/favorites"),
-    ).trim();
+    const redirectTo = safeRedirect(req.body.redirectTo ?? req.get("Referrer"));
     const result = await addFavBuilding(user.userId, buildingId);
 
     if (result.alreadyFavorited) {
@@ -67,9 +72,7 @@ router.post("/favorites/:buildingId/remove", async (req, res) => {
     }
 
     const buildingId = xss(req.params.buildingId || "").trim();
-    const redirectTo = xss(
-      String(req.body.redirectTo || req.get("Referrer") || "/favorites"),
-    ).trim();
+    const redirectTo = safeRedirect(req.body.redirectTo ?? req.get("Referrer"));
 
     await removeFavBuilding(user.userId, buildingId);
 

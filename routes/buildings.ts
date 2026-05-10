@@ -168,6 +168,36 @@ router.post("/building/:id/review", async (req, res) => {
   }
 });
 
+router.post("/building/:id/review/json", async (req, res) => {
+  try {
+    const sessionInfo = req.session as any;
+    const id = xss(req.params.id || "").trim();
+
+    if (!sessionInfo.user) {
+      return res.status(403).json({
+        error: "Please sign in to write a review.",
+      });
+    }
+
+    const building = await getBuildingById(id);
+    const buildingId = (building as any)._id;
+
+    await addReview(
+      buildingId,
+      xss(req.body.reviewText || "").trim(),
+      Number(xss(String(req.body.rating || "")).trim()),
+      new Types.ObjectId(sessionInfo.user.userId),
+    );
+
+    return res.json({ success: true });
+  } catch (e) {
+    return res.status(400).json({
+      error:
+        typeof e === "string" ? e : e instanceof Error ? e.message : "An unknown error occurred.",
+    });
+  }
+});
+
 //comment
 router.post("/building/:id/comment", async (req, res) => {
   try {

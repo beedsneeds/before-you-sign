@@ -5,8 +5,14 @@ import {
   BuildingStoredSchema,
   BuildingModel,
   type Building,
-} from "./models/Building.js";
-import { formatZodError } from "../helpers/validation.js";
+} from './models/Building.js';
+import { ReviewModel } from './models/Review.js';
+import { CommentModel } from './models/Comment.js';
+import { ReplyModel } from './models/Reply.js';
+import { ViolationModel } from './models/Violation.js';
+import { NotificationModel } from './models/Notification.js';
+import { UserModel } from './models/User.js';
+import { formatZodError } from '../helpers/validation.js';
 
 const BuildingIdSchema = z.coerce.number().int().positive();
 
@@ -97,6 +103,21 @@ export const deleteBuildingById = async (buildingID: string | number): Promise<b
   if (!deleted) {
     throw "Unable to delete building";
   }
+
+  const buildingId = deleted._id;
+  const commentIds = await CommentModel.find({ buildingId }).distinct('_id');
+
+  await Promise.all([
+    ReviewModel.deleteMany({ buildingId }).exec(),
+    CommentModel.deleteMany({ buildingId }).exec(),
+    ReplyModel.deleteMany({ topicId: { $in: commentIds } }).exec(),
+    ViolationModel.deleteMany({ buildingId }).exec(),
+    NotificationModel.deleteMany({ buildingId }).exec(),
+    UserModel.updateMany(
+      { savedBuildings: buildingId },
+      { $pull: { savedBuildings: buildingId } },
+    ).exec(),
+  ]);
 
   return true;
 };

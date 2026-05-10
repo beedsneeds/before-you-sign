@@ -191,7 +191,7 @@ const main = async () => {
   ]);
 
   console.log(
-    "To test associated buildings, search BIN 1005521 (requires Manhattan.2025-5-1.to.2026-5-1.zip from releases — rename to violations.csv and place in data/cron/, see cron README)",
+    "To test associated buildings, search BIN 1005521 (requires NYC.2025-5-1.to.2026-5-1.zip from releases. Rename to violations.csv and place in data/cron/, see cron README)",
   );
 
   if (existsSync(CSV_PATH)) {
