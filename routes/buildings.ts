@@ -148,6 +148,7 @@ router.post("/building/:id/review", async (req, res) => {
     const buildingId = (building as any)._id;
 
     await addReview(
+      sessionInfo.user.userId,
       buildingId,
       xss(req.body.reviewText || "").trim(),
       Number(xss(String(req.body.rating || "")).trim()),

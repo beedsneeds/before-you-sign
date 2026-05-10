@@ -1,6 +1,6 @@
-import { Types } from 'mongoose';
-import { ViolationModel } from './models/Violation.js';
-import { getBuildingById } from './buildings.js';
+import { Types } from "mongoose";
+import { ViolationModel } from "./models/Violation.js";
+import { getBuildingById } from "./buildings.js";
 
 //get violations for 1 building
 export const getViolationsByBuildingId = async (buildingId: Types.ObjectId) => {
@@ -23,9 +23,8 @@ export const calculateRatingByViolations = async (
   classICount: number;
   rentImpairingCount: number;
 }> => {
-  const violations = await ViolationModel.find({ bin: bin }).lean();
+  const violations = await ViolationModel.find({ bin }).lean();
 
-  let totalPenalty = 0;
   let classACount = 0;
   let classBCount = 0;
   let classCCount = 0;
@@ -33,27 +32,29 @@ export const calculateRatingByViolations = async (
   let rentImpairingCount = 0;
 
   for (const violation of violations) {
-    if (violation.class === 'A') {
-      totalPenalty += 0.5;
+    if (violation.class === "A") {
       classACount++;
-    } else if (violation.class === 'B') {
-      totalPenalty += 0.25;
+    } else if (violation.class === "B") {
       classBCount++;
-    } else if (violation.class === 'C') {
-      totalPenalty += 1;
+    } else if (violation.class === "C") {
       classCCount++;
-    } else if (violation.class === 'I') {
-      totalPenalty += 0.1;
+    } else if (violation.class === "I") {
       classICount++;
     }
 
     if (violation.rentImpairing === true) {
-      totalPenalty += 0.5;
       rentImpairingCount++;
     }
   }
 
-  const rating = Math.max(0, Number((5 - totalPenalty).toFixed(2)));
+  const severityScore =
+    classACount * 1 +
+    classBCount * 2 +
+    classCCount * 4 +
+    classICount * 0.5 +
+    rentImpairingCount * 2;
+
+  const rating = Number((5 / (1 + severityScore / 25)).toFixed(2));
 
   return {
     rating,
