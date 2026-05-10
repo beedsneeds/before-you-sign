@@ -47,7 +47,7 @@ export const addReview = async (
     buildingId: buildingId,
     reviewText: parsed.data.reviewText,
     rating: parsed.data.rating,
-    userId: new Types.ObjectId(),
+    userId: userId,
     timeCreated: new Date(),
   });
 
