@@ -1,8 +1,16 @@
 import xss from "xss";
 import { Router, type Request, type Response, type NextFunction } from "express";
-import { getUserProfileById, updateUserProfile } from "../data/profile.js";
+import { UserInputSchema } from "../data/models/User.js";
+import { getUserProfileById, updateUserProfile, deleteUserById } from "../data/profile.js";
+import { formatZodError } from "../helpers/validation.js";
 
 const router = Router();
+
+const ProfileUpdateSchema = UserInputSchema.pick({
+  firstName: true,
+  lastName: true,
+  email: true,
+});
 
 const requireLogin = (req: Request, res: Response, next: NextFunction) => {
   const sessionInfo = req.session as any;
@@ -73,13 +81,28 @@ router.post("/edit", requireLogin, async (req, res) => {
   const sessionInfo = req.session as any;
   const firstName = xss(req.body.firstName || "").trim();
   const lastName = xss(req.body.lastName || "").trim();
-  const email = xss(req.body.email || "")
-    .trim()
-    .toLowerCase();
+  const email = xss(req.body.email || "").trim().toLowerCase();
   const password = req.body.password;
   const notificationPrefs = normalizePrefs(req.body.notificationPrefs);
 
   try {
+    const parsed = ProfileUpdateSchema.safeParse({
+      firstName,
+      lastName,
+      email,
+    });
+
+    if (!parsed.success) {
+      throw formatZodError(parsed.error);
+    }
+
+    if (password && password.trim().length > 0) {
+      const parsedPassword = UserInputSchema.shape.password.safeParse(password);
+      if (!parsedPassword.success) {
+        throw formatZodError(parsedPassword.error);
+      }
+    }
+
     const updatedUser = await updateUserProfile(
       sessionInfo.user.userId,
       firstName,
@@ -109,6 +132,24 @@ router.post("/edit", requireLogin, async (req, res) => {
       email,
       prefEmail: notificationPrefs.includes('email'),
       prefInApp: notificationPrefs.includes('inApp'),
+    });
+  }
+});
+
+router.post("/delete", requireLogin, async (req, res) => {
+  const sessionInfo = req.session as any;
+
+  try {
+    await deleteUserById(sessionInfo.user.userId);
+    req.session.destroy(() => {
+      res.redirect("/signin");
+    });
+  } catch (e) {
+    return res.status(400).render("error", {
+      title: "Error",
+      error: e,
+      backLink: "/profile",
+      backLinkText: "Return to profile",
     });
   }
 });

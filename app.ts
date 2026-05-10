@@ -51,16 +51,12 @@ app.use((req, res, next) => {
   next();
 });
 
-/*
-//middleware to protect admin route
+// middleware to protect admin route
 app.use('/admin', (req, res, next) => {
   const sessionInfo = req.session as any;
 
   if (!sessionInfo.user) {
-    return res.render('error', {
-      title: 'Error',
-      error: 'Log in to view admin',
-    });
+    return res.redirect('/signin');
   }
 
   if (sessionInfo.user.isAdmin !== true) {
@@ -74,7 +70,6 @@ app.use('/admin', (req, res, next) => {
 
   next();
 });
-*/
 app.engine(
   "handlebars",
   exphbs.engine({

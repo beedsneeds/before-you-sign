@@ -41,10 +41,25 @@
 
   <br />
 
-  <button type='submit'>{{#if isEditing}}Save Changes{{else}}Register{{/if}}</button>
+  {{#if isEditing}}
+    <div style='display: inline-flex; gap: 10px; flex-wrap: wrap; align-items: center;'>
+      <button type='submit'>Save Changes</button>
+      <button
+        type='submit'
+        form='deleteAccountForm'
+        style='background-color: darkred; border-color: darkred;'
+        onclick='return confirm("Delete your account permanently? This cannot be undone.");'
+      >
+        Delete Account
+      </button>
+    </div>
+  {{else}}
+    <button type='submit'>Register</button>
+  {{/if}}
 </form>
 
 {{#if isEditing}}
+  <form id='deleteAccountForm' action='/profile/delete' method='POST'></form>
   <p>
     <a href='/profile'>Return to profile</a>
   </p>
