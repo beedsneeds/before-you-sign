@@ -1,22 +1,21 @@
-import { createReadStream, createWriteStream } from 'node:fs';
+import { createReadStream } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'csv-parse';
 import * as z from 'zod';
 import { connect, disconnect } from '../config/mongoConnection.js';
-import { ViolationInputSchema, ViolationModel } from '../models/Violation.js';
+import { ViolationInputSchema, ViolationModel, type ViolationDoc } from '../models/Violation.js';
 import { BuildingModel } from '../models/Building.js';
 
 // TODO should I extract this path to a different file to reuse in both fetch and ingest?
 const IN_PATH = 'data/cron/violations.csv';
-const FAILED_LOG = 'data/cron/failedDbWrites.log';
 
 // Aligned to HPD borough IDs. Usage: BORO_NAMES[boroId - 1]
-const BORO_NAMES = ['MANHATTAN', 'BRONX', 'BROOKLYN', 'QUEENS', 'STATEN ISLAND'] as const;
-type BoroName = (typeof BORO_NAMES)[number];
+type BoroName = 'MANHATTAN' | 'BRONX' | 'BROOKLYN' | 'QUEENS' | 'STATEN ISLAND';
+const BORO_NAMES: BoroName[] = ['MANHATTAN', 'BRONX', 'BROOKLYN', 'QUEENS', 'STATEN ISLAND'];
 
 const titleCase = (s: string) => s.toLowerCase().replace(/\b[a-z]/g, (c) => c.toUpperCase());
 
-// csv-parse emits "" for empty cells; strip them so Zod .optional() fields validate.
+// csv-parse outputs "" for empty cells so strip them for Zod .optional() 
 const stripEmpty = (row: Record<string, string>) => {
   const out: Record<string, string> = {};
   for (const [k, v] of Object.entries(row)) {
@@ -61,86 +60,78 @@ const formatAddress = (
   return `${houseNumber} ${titleCase(streetName)}, ${titleCase(boro)}${tail}`;
 };
 
-// We assume the caller will be opening/closing mongoose connections
-export const ingestViolations = async () => {
-  // Helper that streams failures to disk - don't buffer in array, else OOM
-  const failLog = createWriteStream(FAILED_LOG, { flags: 'w' });
+// 1. We assume the caller will be opening/closing mongoose connections
+// 2. collectNew-ly created Violations but not on the seed tick since 
+//    - Don't want to OOM
+//    - Spam users with updates from years ago
+export const ingestViolations = async ({ collectNew = false }: { collectNew?: boolean } = {}) => {
   let failedCount = 0;
-  const recordFailure = (entry: object) => {
+  const recordFailure = (entry: { violationid?: string | number; reason: string }) => {
     failedCount++;
-    failLog.write(JSON.stringify(entry) + '\n');
+    console.error(`[ingest] ${entry.violationid ?? '?'}: ${entry.reason}`);
   };
 
-  let inserted = 0;
+  const newViolations: ViolationDoc[] = [];
+  let processed = 0;
   let total = 0;
-  try {
-    // Stream-parse since initial file can be very large
-    // Socrata csv exports use PascalCase and api csv/json use lowercase
-    const parser = createReadStream(IN_PATH).pipe(
-      parse({
-        columns: (header) => header.map((h: string) => h.toLowerCase()),
-        bom: true,
-        skip_empty_lines: true,
-        trim: true,
-      }),
-    );
 
-    for await (const rawRow of parser as AsyncIterable<Record<string, string>>) {
-      total++;
-      const row = stripEmpty(rawRow);
-      const parsed = ViolationInputSchema.safeParse(apiToInput(row));
-      if (!parsed.success) {
-        recordFailure({
-          violationid: row['violationid'],
-          reason: `validation: ${z.prettifyError(parsed.error)}`,
-          row,
-        });
-        continue;
-      }
+  // Stream-parse since initial file can be very large
+  // Socrata csv exports use PascalCase and api csv/json use lowercase
+  const fileStream = createReadStream(IN_PATH);
+  const parser = fileStream.pipe(
+    parse({
+      columns: (header) => header.map((h: string) => h.toLowerCase()),
+      bom: true,
+      skip_empty_lines: true,
+      trim: true,
+    }),
+  );
+  fileStream.on("error", err => parser.destroy(err));
 
-      const { boroId, ...rest } = parsed.data;
-      const boro = BORO_NAMES[boroId - 1] as BoroName;
-
-      try {
-        // setOnInsert so we never overwrite an existing building's data
-        // setDefaultsOnInsert - same as new buildingDoc.save() where we apply
-        // schema defaults on insert
-        const building = await BuildingModel.findOneAndUpdate(
-          { BIN: rest.bin },
-          {
-            $setOnInsert: {
-              BIN: rest.bin,
-              address: formatAddress(rest.houseNumber, rest.streetName, rest.zip, boro),
-            },
-          },
-          { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true },
-        );
-
-        // Update or insert is quicker than !findOne && insertOne/updateOne
-        // Update for status changes
-        await ViolationModel.updateOne(
-          { violationId: rest.violationId },
-          { $set: { ...rest, boro, buildingId: building._id } },
-          { upsert: true },
-        );
-        inserted++;
-      } catch (err) {
-        recordFailure({
-          violationid: rest.violationId,
-          reason: `db: ${err instanceof Error ? err.message : String(err)}`,
-          row,
-        });
-      }
+  for await (const rawRow of parser as any) {
+    total++;
+    const row = stripEmpty(rawRow);
+    const parsed = ViolationInputSchema.safeParse(apiToInput(row));
+    if (!parsed.success) {
+      recordFailure({
+        violationid: row['violationid'],
+        reason: `validation: ${z.prettifyError(parsed.error)}`,
+      });
+      continue;
     }
 
-    console.log(
-      `ingested ${inserted}/${total}, failed ${failedCount}` +
-        (failedCount ? ` (see ${FAILED_LOG})` : ''),
-    );
-  } finally {
-    await new Promise<void>((resolve) => failLog.end(resolve));
+    const data = parsed.data;
+    const boro = BORO_NAMES[data.boroId - 1];
+
+    try {
+      let building = await BuildingModel.findOne({ BIN: data.bin });
+      if (!building) {
+        building = await BuildingModel.create({
+          BIN: data.bin,
+          address: formatAddress(data.houseNumber, data.streetName, data.zip, boro),
+        });
+      }
+
+      const violation = await ViolationModel.findOne({ violationId: data.violationId });
+      if (violation) {
+        Object.assign(violation, data, { boro, buildingId: building._id });
+        await violation.save();
+      } else {
+        // We only notify new violations (within scope of project proposal)
+        const created = await ViolationModel.create({ ...data, boro, buildingId: building._id });
+        if (collectNew) newViolations.push(created);
+      }
+      processed++;
+    } catch (err) {
+      recordFailure({
+        violationid: data.violationId,
+        reason: `db: ${err instanceof Error ? err.message : String(err)}`,
+      });
+    }
   }
-  return { inserted, total, failedCount };
+
+  console.log(`ingested ${processed}/${total}, failed ${failedCount}`);
+  return { processed, total, failedCount, newViolations };
 };
 
 // Set up connection since there's no caller dbconn

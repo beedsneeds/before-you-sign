@@ -1,3 +1,6 @@
+import * as z from 'zod';
+
+// Not using this anywhere 5/9
 export const checkString = (
   str: string,
   minLength: number,
@@ -23,8 +26,8 @@ export const checkString = (
   if (invalidChars.test(str)) {
     throw `Error: ${str} constains invalid characters.`;
   }
-import * as z from 'zod';
 
   return str;
 };
+
 export const formatZodError = (err: z.ZodError): string => z.prettifyError(err);
