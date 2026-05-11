@@ -13,7 +13,7 @@
 
 ## Start the server
 
-- [ ] Once our db is seeded, run `npm start`
+- [ ] Once our db is seeded, run `npx tsc` and `npm start` or simply `npm run dev`
   - seeddb provides 2 admin users and 1 basic users: "sudo@gmail.com", "mayor@zohranfornyc.com" & "normal@gmail.com" repectively. Their passwords can be found in the seed.ts file. Or you can register your own non-privileged user
 
 ### Testing Email Notifications:
