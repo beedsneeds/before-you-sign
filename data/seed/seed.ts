@@ -111,7 +111,7 @@ const main = async () => {
     "Yes, ours was out for 5 days, had to call 311 until landlord responded.",
     adminId,
   );
-    await addReply(
+  await addReply(
     t1._id,
     "What was worse was I didn't have heating for a week during the worst weather we've seen in decades",
     adminId,
@@ -120,10 +120,8 @@ const main = async () => {
   await addReply(t2._id, "They don't tax the rich enough!!!!", zm_userId);
   await addReply(t2._id, "Affordable housing, that's my campaign promise", zm_userId);
 
-
-
   console.log(
-    "To test associated buildings, search BIN 199995 or 1005521 (requires NYC.2025-5-1.to.2026-5-1.zip from releases. Rename to violations.csv and place in data/cron/, see cron README)",
+    "To test associated buildings, search BIN 1005521 or 199995 (requires NYC.2025-5-1.to.2026-5-1.zip from releases. Rename to violations.csv and place in data/cron/, see cron README)",
   );
 
   if (existsSync(CSV_PATH)) {

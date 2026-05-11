@@ -11,6 +11,8 @@
   - This may take a while, and the logs will be noisy. Once its done, it also logs a list of buildings that will emit notifications during the next automated HPD dataset fetch.
   - Note: Running the seed will also have the side effect of dropping the database
 
+  - To troubleshoot, checkout `data/cron/README.md`
+
 ## Start the server
 
 - [ ] Once our db is seeded, run `npx tsc` and `npm start` or simply `npm run dev`
@@ -32,7 +34,7 @@
 
 ### Testing Associated Buildings
 
-The Associated Buildings feature requires the violations dataset and cron ingestion setup to fully populate the database. Once populated with a release dataset, search for BIN 199995 or 1005521.
+The Associated Buildings feature requires the violations dataset and cron ingestion setup to fully populate the database. Once populated with a release dataset, search for BIN 1005521 or 199995.
 
 ### Seeded Buildings with Reviews and Forum Posts
 
