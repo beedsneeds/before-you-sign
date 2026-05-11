@@ -9,10 +9,11 @@
 
 - [ ] Run `sudo systemctl start mongod` & `npm run seeddb` to launch and seed mongoDb
   - This may take a while, and the logs will be noisy. Once its done, it also logs a list of buildings that will emit notifications during the next automated HPD dataset fetch.
+  - Note: Running the seed will also have the side effect of dropping the database
 
 ## Start the server
 
-- [ ] Once our db is seeded, run `npm run dev`
+- [ ] Once our db is seeded, run `npm start`
   - seeddb provides 2 admin users and 1 basic users: "sudo@gmail.com", "mayor@zohranfornyc.com" & "normal@gmail.com" repectively. Their passwords can be found in the seed.ts file. Or you can register your own non-privileged user
 
 ### Testing Email Notifications:
@@ -25,59 +26,10 @@
 
 - [ ] Run `npx tsx data/cron/cron.ts`. It will fetch from the HPD dataset, ingest, and notify subscribers of any new violations of a saved Building from the last 7 days,
   - Frequency of fetch: every 5 min, so you can Ctrl+C after the first. Ideally this would be run every x days not x minutes, but we keep the wait time short to demonstrate correctness
+  - Prefer favoriting buildings at the end of the list over those at the start because the row limit is 50k and new data is constantly being added to it (even at 10 minute intervals)
 
 ---
 
-#### After a fetch:
+### Testing Associated Buildings
 
-- Run `npm install` to install all deps
-
-#### Before a push:
-
-- Run `npm run format`
-
-## Github Housekeeping:
-
-```bash
-git checkout main
-git pull
-git checkout <branch>
-git merge main # or suggest
-git push origin <branch>
-```
-
-## General
-
-Set-up:
-
-- `sudo systemctl start mongod` (add your mongod cmd if you'd like) and `npm run seeddb`
-- Use `npm run dev` to run TS in development
-
-Run `npm start` to run compiled js AFTER `npm run build` compiles all ts to js into /dist
-
-Strong Typechecking tips:
-
-- Never use `any` unless prototyping
-- See data/models/README.md
-
-#### Imports
-
-Use the .js extension _only_ for import paths even if the actual file is a .ts
-We will not set allowImportingTsExtensions
-
-#### Testing
-
-## Testing Associated Buildings
-
-The Associated Buildings feature REQUIRES the violations dataset and cron ingestion setup.
-
-Before testing this feature, finish Step 1 and 2 in:
-`data/cron/README.md`
-
-Then run:
-
-```bash
-npx tsx data/cron/cron.ts
-```
-
-To test the feature, search for BIN 1005521. Use **Manhattan.2025-5-1.to.2026-5-1.zip** from the releases page.
+The Associated Buildings feature requires the violations dataset and cron ingestion setup to fully populate the database. Once populated with a release dataset, search for BIN 1005521.
