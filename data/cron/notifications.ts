@@ -2,9 +2,15 @@ import 'dotenv/config';
 import { Resend } from 'resend';
 import { fileURLToPath } from 'node:url';
 
-const resend = new Resend(process.env['RESEND_API_KEY']);
+const apiKey = process.env['RESEND_API_KEY'];
+const resend = apiKey ? new Resend(apiKey) : null;
 
 export async function sendEmail(opts: { to: string; subject: string; html: string }) {
+  if (!resend) {
+    console.log('Email notification skipped: RESEND_API_KEY is not defined in your environment.');
+    return null;
+  }
+
   const { data, error } = await resend.emails.send({
     from: 'Before You Sign <onboarding@resend.dev>',
     to: opts.to,
