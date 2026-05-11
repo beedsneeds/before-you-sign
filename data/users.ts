@@ -68,8 +68,6 @@ export const createUser = async ({
     activityScore: 0,
     savedBuildings: [],
     notificationPrefs: ["inApp"],
-    reviewIds: [],
-    commentIds: [],
   });
 
   try {

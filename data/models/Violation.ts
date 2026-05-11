@@ -14,18 +14,14 @@ export const ViolationInputSchema = z.object({
   violationId: z.coerce.number().int().positive(),
 
   bin: z.coerce.number().int().positive(),
-  // TODO do we need bbl?
-  // bbl: z.string().trim().max(20),
 
-  // TODO move to buildings? Write a test during db insert to see if multiple regID for the same building
-  // Same registrationId across rows implies same registered owner
-  // 0 = unregistered owner
+  // Same registrationId across rows implies same registered owner/contact
+  // 0 = when they just can't
   registrationId: z.coerce.number().int().nonnegative().optional(),
   // There's also a HPD version of buildingId. Retain it and rename foreign key if
   // we'll ever join multiple tables
 
   // Address: {housenumber} {streetname}, {boro}, NY {zip}
-  // TODO: include Apt {apartment}?
   houseNumber: z.string().trim().max(20),
   streetName: z.string().trim().max(100),
   apartment: z.string().trim().max(20).optional(),
@@ -37,7 +33,6 @@ export const ViolationInputSchema = z.object({
   // For most serious conditions. higher weightage to overall rating if true
   rentImpairing: yesNoFromApi.optional(),
 
-  // TODO if we ever have a 'view violations' page that displays granular violation data
   // novdescription and Penal Code Violation
   description: z.string().trim().max(2000),
   orderNumber: z.string().trim().max(50).optional(),

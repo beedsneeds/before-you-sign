@@ -1,8 +1,6 @@
-import * as z from "zod";
 import escapeStringRegexp from "escape-string-regexp";
 import {
   BuildingInputSchema,
-  BuildingStoredSchema,
   BuildingModel,
   type Building,
 } from './models/Building.js';
@@ -12,9 +10,7 @@ import { ReplyModel } from './models/Reply.js';
 import { ViolationModel } from './models/Violation.js';
 import { NotificationModel } from './models/Notification.js';
 import { UserModel } from './models/User.js';
-import { formatZodError } from '../helpers/validation.js';
-
-const BuildingIdSchema = z.coerce.number().int().positive();
+import { BinSchema, formatZodError } from '../helpers/validation.js';
 
 export const createBuilding = async (
   address: string,
@@ -46,7 +42,7 @@ export const createBuilding = async (
 };
 
 export const getBuildingById = async (buildingID: string | number): Promise<Building> => {
-  const parsed = BuildingIdSchema.safeParse(buildingID);
+  const parsed = BinSchema.safeParse(buildingID);
   if (!parsed.success) throw formatZodError(parsed.error);
 
   const building = await BuildingModel.findOne({ BIN: parsed.data });
@@ -61,7 +57,7 @@ export const updateBuildingById = async (
   address: string,
   binNumber: string | number,
 ): Promise<Building> => {
-  const parsedId = BuildingIdSchema.safeParse(buildingID);
+  const parsedId = BinSchema.safeParse(buildingID);
   if (!parsedId.success) throw formatZodError(parsedId.error);
 
   const parsed = BuildingInputSchema.safeParse({
@@ -95,7 +91,7 @@ export const updateBuildingById = async (
 };
 
 export const deleteBuildingById = async (buildingID: string | number): Promise<boolean> => {
-  const parsed = BuildingIdSchema.safeParse(buildingID);
+  const parsed = BinSchema.safeParse(buildingID);
   if (!parsed.success) throw formatZodError(parsed.error);
 
   const deleted = await BuildingModel.findOneAndDelete({ BIN: parsed.data });

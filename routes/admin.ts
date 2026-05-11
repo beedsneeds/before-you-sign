@@ -2,7 +2,6 @@
 
 import { Router } from "express";
 import xss from "xss";
-import * as z from "zod";
 
 import {
   createBuilding,
@@ -12,17 +11,9 @@ import {
 } from "../data/buildings.js";
 
 import { BuildingInputSchema } from "../data/models/Building.js";
-import { formatZodError } from "../helpers/validation.js";
+import { BinSchema, formatZodError } from "../helpers/validation.js";
 
 const router = Router();
-
-const BuildingBinFormSchema = z.object({
-  BIN: z.coerce.number().int().positive(),
-});
-
-const OriginalBinFormSchema = z.object({
-  originalBIN: z.coerce.number().int().positive(),
-});
 
 const parseBuildingInputForm = (body: any) => {
   return BuildingInputSchema.safeParse({
@@ -82,9 +73,7 @@ router.get("/delete", async (req, res) => {
 
 // Look up building by BIN before editing
 router.post("/edit", async (req, res) => {
-  const parsedBin = BuildingBinFormSchema.safeParse({
-    BIN: xss(req.body.BIN || "").trim(),
-  });
+  const parsedBin = BinSchema.safeParse(xss(req.body.BIN || "").trim());
 
   if (!parsedBin.success) {
     return res.status(400).render("admin/editBuilding", {
@@ -97,7 +86,7 @@ router.post("/edit", async (req, res) => {
   }
 
   try {
-    const building = await getBuildingById(parsedBin.data.BIN);
+    const building = await getBuildingById(parsedBin.data);
 
     return res.render("admin/editBuilding", {
       title: "Edit Building",
@@ -108,7 +97,7 @@ router.post("/edit", async (req, res) => {
       title: "Edit Building",
       error: e,
       formData: {
-        BIN: parsedBin.data.BIN,
+        BIN: parsedBin.data,
       },
     });
   }
@@ -116,9 +105,7 @@ router.post("/edit", async (req, res) => {
 
 // Submit edited building
 router.post("/edit/submit", async (req, res) => {
-  const parsedOriginalBin = OriginalBinFormSchema.safeParse({
-    originalBIN: xss(req.body.originalBIN || "").trim(),
-  });
+  const parsedOriginalBin = BinSchema.safeParse(xss(req.body.originalBIN || "").trim());
 
   const parsedBuilding = parseBuildingInputForm(req.body);
 
@@ -148,7 +135,7 @@ router.post("/edit/submit", async (req, res) => {
 
   try {
     const updatedBuilding = await updateBuildingById(
-      parsedOriginalBin.data.originalBIN,
+      parsedOriginalBin.data,
       parsedBuilding.data.address,
       parsedBuilding.data.BIN,
     );
@@ -169,9 +156,7 @@ router.post("/edit/submit", async (req, res) => {
 
 // Look up building by BIN before deleting
 router.post("/delete", async (req, res) => {
-  const parsedBin = BuildingBinFormSchema.safeParse({
-    BIN: xss(req.body.BIN || "").trim(),
-  });
+  const parsedBin = BinSchema.safeParse(xss(req.body.BIN || "").trim());
 
   if (!parsedBin.success) {
     return res.status(400).render("admin/removeBuilding", {
@@ -184,7 +169,7 @@ router.post("/delete", async (req, res) => {
   }
 
   try {
-    const building = await getBuildingById(parsedBin.data.BIN);
+    const building = await getBuildingById(parsedBin.data);
 
     return res.render("admin/removeBuilding", {
       title: "Delete Building",
@@ -195,7 +180,7 @@ router.post("/delete", async (req, res) => {
       title: "Delete Building",
       error: e,
       formData: {
-        BIN: parsedBin.data.BIN,
+        BIN: parsedBin.data,
       },
     });
   }
@@ -203,9 +188,7 @@ router.post("/delete", async (req, res) => {
 
 // Delete after confirmation
 router.post("/delete/confirm", async (req, res) => {
-  const parsedBin = BuildingBinFormSchema.safeParse({
-    BIN: xss(req.body.BIN || "").trim(),
-  });
+  const parsedBin = BinSchema.safeParse(xss(req.body.BIN || "").trim());
 
   if (!parsedBin.success) {
     return res.status(400).render("admin/removeBuilding", {
@@ -215,7 +198,7 @@ router.post("/delete/confirm", async (req, res) => {
   }
 
   try {
-    await deleteBuildingById(parsedBin.data.BIN);
+    await deleteBuildingById(parsedBin.data);
 
     return res.render("admin/removeBuilding", {
       title: "Delete Building",

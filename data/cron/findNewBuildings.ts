@@ -6,7 +6,6 @@ import { BuildingModel } from '../models/Building.js';
 
 // Utility-only file:
 // Tells you what notifySubscribers would fire on the next cron tick
-// npx tsx data/cron/findNewBuildings.ts
 
 const API = 'https://data.cityofnewyork.us/resource/wvxf-dwi5.json';
 

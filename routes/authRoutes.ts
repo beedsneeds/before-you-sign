@@ -103,6 +103,15 @@ router
       });
     }
 
+    const emailParse = UserInputSchema.shape.email.safeParse(email);
+    if (!emailParse.success) {
+      return res.status(400).render("signin", {
+        title: "Sign In",
+        error: "Please enter a valid email address.",
+        email,
+      });
+    }
+
     try {
       const user = await checkUser(email, password);
 

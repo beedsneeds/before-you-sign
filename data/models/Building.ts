@@ -8,8 +8,13 @@ export const BuildingInputSchema = z.object({
     .string()
     .normalize()
     .trim()
-    .min(1, 'Address must be supplied')
-    .max(200, 'Address cannot be more than 200 characters'),
+    .min(5, 'Address must be at least 5 characters')
+    .max(200, 'Address cannot be more than 200 characters')
+    .regex(/[a-zA-Z]/, 'Address must contain at least one letter')
+    .regex(
+      /^[a-zA-Z0-9 ,.'\-#/]+$/,
+      "Address may only contain letters, numbers, spaces, and , . ' - # /",
+    ),
   BIN: z.number().positive('BIN must be positive').int('BIN must be a whole number'),
   // HPD owner registration. Same regID across buildings implies same registered owner.
   // Sourced from violation rows during ingest; 0 (unregistered) is rejected so absence is null.

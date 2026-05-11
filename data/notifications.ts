@@ -1,14 +1,8 @@
-import * as z from 'zod';
-import { Types } from 'mongoose';
 import { NotificationModel } from './models/Notification.js';
 import { ViolationModel } from './models/Violation.js';
-import { formatZodError } from '../helpers/validation.js';
+import { ObjectIdSchema, formatZodError } from '../helpers/validation.js';
 
-// refine/tranform for validation and coercion
-const UserIdSchema = z
-  .string()
-  .refine((s) => Types.ObjectId.isValid(s), { message: 'Invalid user ID' })
-  .transform((s) => new Types.ObjectId(s));
+const UserIdSchema = ObjectIdSchema;
 
 export const getNotificationsForUser = async (userId: string) => {
   const parsed = UserIdSchema.safeParse(userId);

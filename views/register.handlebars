@@ -32,6 +32,11 @@
         <input type='checkbox' name='notificationPrefs' value='email' {{#if prefEmail}}checked{{/if}} >
         Email
       </label>
+      <p class='message'>
+        Email notifications require a Resend API key. Create one at
+        <a href='https://resend.com/api-keys' target='_blank' rel='noopener noreferrer'>resend.com/api-keys</a>
+        and add it to your <code>.env</code> as <code>RESEND_API_KEY</code>.
+      </p>
       <label>
         <input type='checkbox' name='notificationPrefs' value='inApp' {{#if prefInApp}}checked{{/if}} >
         In-app

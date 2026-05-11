@@ -9,7 +9,12 @@ export const CommentInputSchema = z.object({
   buildingId: z.instanceof(Types.ObjectId),
   reviewId: z.instanceof(Types.ObjectId).optional(),
 
-  topicTitle: z.string().trim().min(1).max(100),
+  topicTitle: z
+    .string()
+    .trim()
+    .min(5, 'Topic title must be at least 5 characters')
+    .max(100, 'Topic title cannot be more than 100 characters')
+    .regex(/[a-zA-Z]/, 'Topic title must contain at least one letter'),
 });
 
 export const CommentStoredSchema = CommentInputSchema.extend({

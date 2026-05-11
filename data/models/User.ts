@@ -37,24 +37,20 @@ export const UserStoredSchema = UserInputSchema.omit({ password: true }).extend(
   activityScore: z.number().int().nonnegative(),
   savedBuildings: z.array(z.instanceof(Types.ObjectId)),
   notificationPrefs: z.array(NotifyMethod),
-  reviewIds: z.array(z.instanceof(Types.ObjectId)),
-  commentIds: z.array(z.instanceof(Types.ObjectId)),
   // TODO fields: karma
 });
 
 export type User = z.infer<typeof UserStoredSchema>;
 
 const UserDbSchema = new Schema<User>({
-  firstName: { type: String, required: true, maxlength: 40 },
-  lastName: { type: String, required: true, maxlength: 40 },
+  firstName: { type: String, required: true, maxlength: 50 },
+  lastName: { type: String, required: true, maxlength: 50 },
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   hashedPassword: { type: String, required: true },
   isAdmin: { type: Boolean, required: true, default: false },
   activityScore: { type: Number, required: true, default: 0, min: 0 },
   savedBuildings: [{ type: Schema.Types.ObjectId, ref: "Building" }],
   notificationPrefs: { type: [{ type: String, enum: NotifyMethod.options }], default: ["inApp"] },
-  reviewIds: [{ type: Schema.Types.ObjectId, ref: "Review" }],
-  commentIds: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
 });
 
 export const UserModel = model<User>("User", UserDbSchema);

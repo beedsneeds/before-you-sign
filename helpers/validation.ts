@@ -1,6 +1,16 @@
 import * as z from 'zod';
+import { Types } from 'mongoose';
 
-// Not using this anywhere 5/9
+export const BinSchema = z.coerce
+  .number()
+  .int('BIN must be a whole number')
+  .positive('BIN must be positive');
+
+export const ObjectIdSchema = z
+  .string()
+  .refine((s) => Types.ObjectId.isValid(s), { message: 'Invalid id' })
+  .transform((s) => new Types.ObjectId(s));
+
 export const checkString = (
   str: string,
   minLength: number,

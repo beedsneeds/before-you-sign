@@ -27,7 +27,6 @@
     <h1>{{building.address}}</h1>
     <p>BIN: {{building.BIN}}</p>
     <p>Avg Rating: {{round building.avgRating}} ({{building.reviewsCount}} review/s)</p>
-    <p>Violations Count: {{violations_count}}</p>
     <p>Building Safety Score: {{violationSummary.rating}} / 5</p>
     <p>Total Violations: {{violationSummary.totalViolations}}</p>
 
@@ -61,16 +60,20 @@
     {{> reviewscard}}
   {{/each}}
 
-  <h3>Add a review</h3>
+  <h3>{{#if userReview}}Edit your review{{else}}Add a review{{/if}}</h3>
+
+  {{#if userReview}}
+    <p class="small-text">You have already reviewed this building. You can update it below.</p>
+  {{/if}}
 
   <form id="reviewForm" method="POST" action="/building/{{building.BIN}}/review" data-ajax-endpoint="/building/{{building.BIN}}/review/json">
     <label for="reviewText">Review:</label>
-    <input type="text" id="reviewText" name="reviewText" placeholder="Please write a review" required >
+    <input type="text" id="reviewText" name="reviewText" placeholder="Please write a review" value="{{userReview.reviewText}}" required >
 
     <label for="rating">Rating (1-5):</label>
-    <input type="number" id="rating" name="rating" min="1" max="5" required >
+    <input type="number" id="rating" name="rating" min="1" max="5" value="{{userReview.rating}}" required >
 
-    <button type="submit">Submit</button>
+    <button type="submit">{{#if userReview}}Update Review{{else}}Submit{{/if}}</button>
   </form>
 </section>
 
@@ -134,7 +137,7 @@
   {{#each comments}}
     <div class="forum-topic">
       <button class="topic-toggle">
-        {{this.comment.topicTitle}} — {{this.comment.userId.firstName}}
+        {{this.comment.topicTitle}} - {{this.comment.userId.firstName}} ({{this.comment.userId.activityScore}} karma)
       </button>
 
       <div class="topic-content">
@@ -142,7 +145,7 @@
 
         {{#if this.replies.length}}
           {{#each this.replies}}
-            <p>{{this.replyText}} — <span class="username">{{this.userId.firstName}}</span> ({{this.userId.activityScore}} karma)</p>
+            <p>{{this.replyText}}. <span class="username">{{this.userId.firstName}}</span> ({{this.userId.activityScore}} karma)</p>
           {{/each}}
         {{else}}
           <p>No replies yet.</p>

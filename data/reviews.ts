@@ -1,56 +1,64 @@
 import * as z from "zod";
 import { Types } from "mongoose";
-import { ReviewModel, ReviewInputSchema, type Review } from "./models/Review.js";
+import { ReviewModel, type Review } from "./models/Review.js";
 import { BuildingModel } from "./models/Building.js";
 import { addKarma, KARMA_PER_CONTRIBUTION } from "./users.js";
 import { formatZodError } from "../helpers/validation.js";
-//import { getUserProfileById } from "./profile.js";
 
-const AddReviewSchema = ReviewInputSchema.pick({ rating: true }).extend({
-  reviewText: z.string().trim().min(10).max(2000),
+export const AddReviewSchema = z.object({
+  reviewText: z
+    .string()
+    .trim()
+    .min(10, 'Review must be at least 10 characters')
+    .max(2000, 'Review cannot be more than 2000 characters'),
+  rating: z.coerce
+    .number()
+    .int('Rating must be a whole number')
+    .min(1, 'Rating must be between 1 and 5')
+    .max(5, 'Rating must be between 1 and 5'),
 });
 
 export const getReviewsByBuildingId = async (buildingId: Types.ObjectId): Promise<Review[]> => {
-  const reviews = await ReviewModel.find({ buildingId: buildingId }).populate('userId', 'firstName');
+  const reviews = await ReviewModel.find({ buildingId: buildingId }).populate('userId', 'firstName activityScore');
   return reviews.map((review) => review.toObject());
 };
 
-//adding review and update the building stats
-export const addReview = async (
-  
-  //rahim
+export const getReviewByUserAndBuilding = async (
+  userId: Types.ObjectId,
   buildingId: Types.ObjectId,
- 
+): Promise<Review | null> => {
+  const review = await ReviewModel.findOne({ userId, buildingId });
+  return review ? review.toObject() : null;
+};
+// each user gets one review per building. if one already exists, this updates it
+export const addReview = async (
+  buildingId: Types.ObjectId,
   reviewText: string,
- 
   rating: number,
   userId: Types.ObjectId,
 ) => {
-  //rahim
   if (!Types.ObjectId.isValid(userId)) throw new Error("Invalid user ID");
 
   const parsed = AddReviewSchema.safeParse({ reviewText, rating });
   if (!parsed.success) throw formatZodError(parsed.error);
 
-  //rahim
-  //const userObjectId = new Types.ObjectId(userId);
+  const existingReview = await ReviewModel.findOne({ userId, buildingId });
 
-  const existingReview = await ReviewModel.findOne({
-    userId: userId,
-    buildingId,
-  });
+  let savedReview;
   if (existingReview) {
-    throw "You have already reviewd this building";
+    existingReview.reviewText = parsed.data.reviewText;
+    existingReview.rating = parsed.data.rating;
+    await existingReview.save();
+    savedReview = existingReview;
+  } else {
+    savedReview = await ReviewModel.create({
+      buildingId: buildingId,
+      reviewText: parsed.data.reviewText,
+      rating: parsed.data.rating,
+      userId: userId,
+      timeCreated: new Date(),
+    });
   }
-  //
-
-  const newReview = await ReviewModel.create({
-    buildingId: buildingId,
-    reviewText: parsed.data.reviewText,
-    rating: parsed.data.rating,
-    userId: userId,
-    timeCreated: new Date(),
-  });
 
   const allReviews = await ReviewModel.find({ buildingId: buildingId });
 
@@ -66,7 +74,9 @@ export const addReview = async (
     reviewsCount: reviewsCount,
   });
 
-  await addKarma(userId, KARMA_PER_CONTRIBUTION);
+  if (!existingReview) {
+    await addKarma(userId, KARMA_PER_CONTRIBUTION);
+  }
 
-  return newReview;
+  return savedReview;
 };
