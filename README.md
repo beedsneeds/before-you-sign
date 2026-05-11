@@ -32,4 +32,11 @@
 
 ### Testing Associated Buildings
 
-The Associated Buildings feature requires the violations dataset and cron ingestion setup to fully populate the database. Once populated with a release dataset, search for BIN 1005521.
+The Associated Buildings feature requires the violations dataset and cron ingestion setup to fully populate the database. Once populated with a release dataset, search for BIN 199995 or 1005521.
+
+### Seeded Buildings with Reviews and Forum Posts
+
+Search for
+
+- 179-49 Zoller Road, Queens, NY 11434 BIN: 4269660
+- 178-26 Zoller Road, Queens, NY 11434 BIN: 4270016

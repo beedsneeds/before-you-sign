@@ -103,7 +103,7 @@ export const calculateRatingByViolations = async (
 
 // Buildings sharing an HPD owner registration ID
 export const getBuildingsByRegID = async (regID: number) => {
-  if (!Number.isInteger(regID) || regID <= 0) return [];
+  if (!Number.isInteger(regID) || regID < 0) return [];
 
   const buildings = await BuildingModel.find({ regID }).lean();
 
