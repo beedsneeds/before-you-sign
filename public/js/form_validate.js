@@ -25,9 +25,25 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  const searchForm = document.querySelector(".home-search-form");
+
+  if (searchForm) {
+    searchForm.addEventListener("submit", function (event) {
+      const searchInput = searchForm.querySelector('input[name="search"]');
+      const searchValue = searchInput ? searchInput.value.trim() : "";
+
+      if (searchValue.length === 0) {
+        event.preventDefault();
+        alert("Search term must be supplied.");
+      }
+    });
+  }
+
   let forms = document.querySelectorAll(
     '#adminEditLookupForm, #adminEditSubmitForm, #adminDeleteLookupForm, #adminDeleteConfirmForm, form[action="/admin/add"]',
   );
+
+  const buildingAddressRegex = /^[a-zA-Z0-9 ,.'\-#/]+$/;
 
   for (let i = 0; i < forms.length; i++) {
     forms[i].addEventListener("submit", function (event) {
@@ -70,10 +86,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (address.length === 0) {
           errorMessages.push("Address must be supplied.");
-        }
-
-        if (address.length > 200) {
+        } else if (address.length < 5) {
+          errorMessages.push("Address must be at least 5 characters.");
+        } else if (address.length > 200) {
           errorMessages.push("Address cannot be more than 200 characters.");
+        } else if (!/[a-zA-Z]/.test(address)) {
+          errorMessages.push("Address must contain at least one letter.");
+        } else if (!buildingAddressRegex.test(address)) {
+          errorMessages.push("Address may only contain letters, numbers, spaces, and , . ' - # /");
         }
       }
 
@@ -117,6 +137,41 @@ document.addEventListener("DOMContentLoaded", function () {
   const nameRegex = /^[a-zA-Z ]+$/;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+    const validatePassword = function (password, isOptional) {
+    const passwordErrors = [];
+    const value = password || "";
+
+    if (isOptional && value.trim().length === 0) {
+      return passwordErrors;
+    }
+
+    if (!value || value.length < 8) {
+      passwordErrors.push("Password must be at least 8 characters.");
+    }
+
+    if (value.length > 128) {
+      passwordErrors.push("Password cannot be more than 128 characters.");
+    }
+
+    if (/\s/.test(value)) {
+      passwordErrors.push("Password must not contain whitespace.");
+    }
+
+    if (!/[A-Z]/.test(value)) {
+      passwordErrors.push("Password must contain an uppercase letter.");
+    }
+
+    if (!/[0-9]/.test(value)) {
+      passwordErrors.push("Password must contain a number.");
+    }
+
+    if (!/[^a-zA-Z0-9]/.test(value)) {
+      passwordErrors.push("Password must contain a special character.");
+    }
+
+    return passwordErrors;
+  };
+
   for (let i = 0; i < authForms.length; i++) {
     authForms[i].addEventListener("submit", function (event) {
       const firstNameInput = authForms[i].querySelector('input[name="firstName"]');
@@ -158,23 +213,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         if (action === "/register") {
-          if (!password || password.length < 8) {
-            errorMessages.push("Password must be at least 8 characters.");
-          }
-
-          if (password && password.includes(" ")) {
-            errorMessages.push("Password must not contain whitespace.");
-          }
+          errorMessages.push(...validatePassword(password, false));
         }
 
-        if (action === "/profile/edit" && password && password.trim().length > 0) {
-          if (password.length < 8) {
-            errorMessages.push("Password must be at least 8 characters if provided.");
-          }
-
-          if (password.includes(" ")) {
-            errorMessages.push("Password must not contain whitespace.");
-          }
+        if (action === "/profile/edit") {
+          errorMessages.push(...validatePassword(password, true));
         }
       }
 

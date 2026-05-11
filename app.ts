@@ -51,6 +51,14 @@ app.use((req, res, next) => {
   next();
 });
 
+// prevent protected pages from being shown from browser cache after signout
+app.use((req, res, next) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  next();
+});
+
 // middleware to protect admin route
 app.use('/admin', (req, res, next) => {
   const sessionInfo = req.session as any;
