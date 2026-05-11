@@ -89,8 +89,10 @@ if (reviewForm) {
 
     if (!reviewText || reviewText.length < 10) {
       errorMessage = "Review must be at least 10 characters.";
-    } else if (rating < 1 || rating > 5) {
-      errorMessage = "Rating must be between 1 and 5.";
+    } else if (reviewText.length > 2000) {
+      errorMessage = "Review cannot be more than 2000 characters.";
+    } else if (isNaN(rating) || !Number.isInteger(rating) || rating < 1 || rating > 5) {
+      errorMessage = "Rating must be a whole number between 1 and 5.";
     }
 
     if (errorMessage) {
@@ -137,23 +139,35 @@ if (commentForm) {
   commentForm.addEventListener("submit", function (e) {
     const title = document.getElementById("topicTitle").value.trim();
 
-    if (!title || title.length < 5) {
+    if (!title) {
       e.preventDefault();
-      alert("Topic name cannot be empty.");
+      alert("Topic title is required.");
+    } else if (title.length < 5) {
+      e.preventDefault();
+      alert("Topic title must be at least 5 characters.");
+    } else if (title.length > 100) {
+      e.preventDefault();
+      alert("Topic title cannot be more than 100 characters.");
+    } else if (!/[a-zA-Z]/.test(title)) {
+      e.preventDefault();
+      alert("Topic title must contain at least one letter.");
     }
   });
 }
 
 // reply validation
-const replyforms = document.querySelectorAll('.topic-content form');
+const replyforms = document.querySelectorAll(".topic-content form");
 
 for (let i = 0; i < replyforms.length; i++) {
-  replyforms[i].addEventListener('submit', function (e) {
+  replyforms[i].addEventListener("submit", function (e) {
     const textInReply = this.querySelector('[name="replyText"]').value.trim();
 
     if (!textInReply || textInReply.length < 1) {
       e.preventDefault();
-      alert('Reply cannot be empty.');
+      alert("Reply cannot be empty.");
+    } else if (textInReply.length > 2000) {
+      e.preventDefault();
+      alert("Reply cannot be more than 2000 characters.");
     }
   });
 }

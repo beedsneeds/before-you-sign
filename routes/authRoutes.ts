@@ -135,6 +135,7 @@ router
 
 router.get("/signout", async (req, res) => {
   req.session.destroy(() => {
+    res.clearCookie("BeforeYouSignAuthState");
     res.redirect("/signin");
   });
 });
