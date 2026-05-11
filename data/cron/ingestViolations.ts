@@ -104,8 +104,8 @@ export const ingestViolations = async ({ collectNew = false }: { collectNew?: bo
     const boro = BORO_NAMES[data.boroId - 1];
 
     try {
-      // 0 = unregistered owner. treat as absent so we don't index a meaningless value
-      const regID = data.registrationId && data.registrationId > 0 ? data.registrationId : undefined;
+      // Allow 0 to be stored and indexed as a valid registration ID
+      const regID = typeof data.registrationId === 'number' ? data.registrationId : undefined;
 
       let building = await BuildingModel.findOne({ BIN: data.bin });
       if (!building) {
@@ -114,7 +114,7 @@ export const ingestViolations = async ({ collectNew = false }: { collectNew?: bo
           address: formatAddress(data.houseNumber, data.streetName, data.zip, boro),
           regID,
         });
-      } else if (regID && !building.regID) {
+      } else if (regID !== undefined && (building.regID === undefined || building.regID === null)) {
         building.regID = regID;
         await building.save();
       }

@@ -21,7 +21,7 @@ export const BuildingInputSchema = z.object({
   regID: z
     .number()
     .int('regID must be a whole number')
-    .positive('regID must be positive')
+    .nonnegative('regID must be non-negative')
     .optional(),
 });
 
@@ -38,7 +38,7 @@ export type Building = z.infer<typeof BuildingStoredSchema>;
 const BuildingDbSchema = new Schema<Building>({
   address: { type: String, required: true, maxlength: 200, trim: true },
   BIN: { type: Number, required: true, unique: true },
-  regID: { type: Number, min: 1, index: true },
+  regID: { type: Number, min: 0, index: true },
   avgRating: { type: Number, required: true, default: 0, min: 0, max: 5 },
   reviewsCount: { type: Number, required: true, default: 0, min: 0 },
 });
